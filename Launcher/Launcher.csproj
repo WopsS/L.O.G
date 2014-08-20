@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6E66ADF7-FE9E-4345-86FC-E168E2D9724C}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Launcher</RootNamespace>
+    <AssemblyName>L.O.G. Multiplayer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>D:\Jocuri\Steam\SteamApps\common\Kerbal Space Program\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AddServer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddServer.Designer.cs">
+      <DependentUpon>AddServer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Lidgren Network\Encryption\INetEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetAESEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetBlockEncryptionBase.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetDESEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetRC2Encryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetTripleDESEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetXorEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetXteaEncryption.cs" />
+    <Compile Include="Lidgren Network\NamespaceDoc.cs" />
+    <Compile Include="Lidgren Network\NetBigInteger.cs" />
+    <Compile Include="Lidgren Network\NetBitVector.cs" />
+    <Compile Include="Lidgren Network\NetBitWriter.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Peek.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Read.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Read.Reflection.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Write.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Write.Reflection.cs" />
+    <Compile Include="Lidgren Network\NetClient.cs" />
+    <Compile Include="Lidgren Network\NetConnection.cs" />
+    <Compile Include="Lidgren Network\NetConnection.Handshake.cs" />
+    <Compile Include="Lidgren Network\NetConnection.Latency.cs" />
+    <Compile Include="Lidgren Network\NetConnection.MTU.cs" />
+    <Compile Include="Lidgren Network\NetConnectionStatistics.cs" />
+    <Compile Include="Lidgren Network\NetConnectionStatus.cs" />
+    <Compile Include="Lidgren Network\NetConstants.cs" />
+    <Compile Include="Lidgren Network\NetDeliveryMethod.cs" />
+    <Compile Include="Lidgren Network\NetException.cs" />
+    <Compile Include="Lidgren Network\NetFragmentationHelper.cs" />
+    <Compile Include="Lidgren Network\NetFragmentationInfo.cs" />
+    <Compile Include="Lidgren Network\NetIncomingMessage.cs" />
+    <Compile Include="Lidgren Network\NetIncomingMessageType.cs" />
+    <Compile Include="Lidgren Network\NetMessageType.cs" />
+    <Compile Include="Lidgren Network\NetNatIntroduction.cs" />
+    <Compile Include="Lidgren Network\NetOutgoingMessage.cs" />
+    <Compile Include="Lidgren Network\NetPeer.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Discovery.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Fragmentation.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Internal.cs" />
+    <Compile Include="Lidgren Network\NetPeer.LatencySimulation.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Logging.cs" />
+    <Compile Include="Lidgren Network\NetPeer.MessagePools.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Send.cs" />
+    <Compile Include="Lidgren Network\NetPeerConfiguration.cs" />
+    <Compile Include="Lidgren Network\NetPeerStatistics.cs" />
+    <Compile Include="Lidgren Network\NetPeerStatus.cs" />
+    <Compile Include="Lidgren Network\NetQueue.cs" />
+    <Compile Include="Lidgren Network\NetRandom.cs" />
+    <Compile Include="Lidgren Network\NetReceiverChannelBase.cs" />
+    <Compile Include="Lidgren Network\NetReliableOrderedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetReliableSenderChannel.cs" />
+    <Compile Include="Lidgren Network\NetReliableSequencedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetReliableUnorderedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetSenderChannelBase.cs" />
+    <Compile Include="Lidgren Network\NetSendResult.cs" />
+    <Compile Include="Lidgren Network\NetServer.cs" />
+    <Compile Include="Lidgren Network\NetSRP.cs" />
+    <Compile Include="Lidgren Network\NetStoredReliableMessage.cs" />
+    <Compile Include="Lidgren Network\NetTime.cs" />
+    <Compile Include="Lidgren Network\NetTuple.cs" />
+    <Compile Include="Lidgren Network\NetUnreliableSenderChannel.cs" />
+    <Compile Include="Lidgren Network\NetUnreliableSequencedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetUnreliableUnorderedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetUPnP.cs" />
+    <Compile Include="Lidgren Network\NetUtility.cs" />
+    <Compile Include="Lidgren Network\SenderChannelBase.cs" />
+    <Compile Include="Main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main.Designer.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Network.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerInfo.cs" />
+    <EmbeddedResource Include="AddServer.resx">
+      <DependentUpon>AddServer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Main.resx">
+      <DependentUpon>Main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

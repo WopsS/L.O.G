@@ -53,6 +53,72 @@
     <Compile Include="Chat.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="L.O.G.cs" />
+    <Compile Include="Lidgren Network\Encryption\INetEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetAESEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetBlockEncryptionBase.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetDESEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetRC2Encryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetTripleDESEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetXorEncryption.cs" />
+    <Compile Include="Lidgren Network\Encryption\NetXteaEncryption.cs" />
+    <Compile Include="Lidgren Network\NamespaceDoc.cs" />
+    <Compile Include="Lidgren Network\NetBigInteger.cs" />
+    <Compile Include="Lidgren Network\NetBitVector.cs" />
+    <Compile Include="Lidgren Network\NetBitWriter.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Peek.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Read.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Read.Reflection.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Write.cs" />
+    <Compile Include="Lidgren Network\NetBuffer.Write.Reflection.cs" />
+    <Compile Include="Lidgren Network\NetClient.cs" />
+    <Compile Include="Lidgren Network\NetConnection.cs" />
+    <Compile Include="Lidgren Network\NetConnection.Handshake.cs" />
+    <Compile Include="Lidgren Network\NetConnection.Latency.cs" />
+    <Compile Include="Lidgren Network\NetConnection.MTU.cs" />
+    <Compile Include="Lidgren Network\NetConnectionStatistics.cs" />
+    <Compile Include="Lidgren Network\NetConnectionStatus.cs" />
+    <Compile Include="Lidgren Network\NetConstants.cs" />
+    <Compile Include="Lidgren Network\NetDeliveryMethod.cs" />
+    <Compile Include="Lidgren Network\NetException.cs" />
+    <Compile Include="Lidgren Network\NetFragmentationHelper.cs" />
+    <Compile Include="Lidgren Network\NetFragmentationInfo.cs" />
+    <Compile Include="Lidgren Network\NetIncomingMessage.cs" />
+    <Compile Include="Lidgren Network\NetIncomingMessageType.cs" />
+    <Compile Include="Lidgren Network\NetMessageType.cs" />
+    <Compile Include="Lidgren Network\NetNatIntroduction.cs" />
+    <Compile Include="Lidgren Network\NetOutgoingMessage.cs" />
+    <Compile Include="Lidgren Network\NetPeer.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Discovery.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Fragmentation.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Internal.cs" />
+    <Compile Include="Lidgren Network\NetPeer.LatencySimulation.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Logging.cs" />
+    <Compile Include="Lidgren Network\NetPeer.MessagePools.cs" />
+    <Compile Include="Lidgren Network\NetPeer.Send.cs" />
+    <Compile Include="Lidgren Network\NetPeerConfiguration.cs" />
+    <Compile Include="Lidgren Network\NetPeerStatistics.cs" />
+    <Compile Include="Lidgren Network\NetPeerStatus.cs" />
+    <Compile Include="Lidgren Network\NetQueue.cs" />
+    <Compile Include="Lidgren Network\NetRandom.cs" />
+    <Compile Include="Lidgren Network\NetReceiverChannelBase.cs" />
+    <Compile Include="Lidgren Network\NetReliableOrderedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetReliableSenderChannel.cs" />
+    <Compile Include="Lidgren Network\NetReliableSequencedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetReliableUnorderedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetSenderChannelBase.cs" />
+    <Compile Include="Lidgren Network\NetSendResult.cs" />
+    <Compile Include="Lidgren Network\NetServer.cs" />
+    <Compile Include="Lidgren Network\NetSRP.cs" />
+    <Compile Include="Lidgren Network\NetStoredReliableMessage.cs" />
+    <Compile Include="Lidgren Network\NetTime.cs" />
+    <Compile Include="Lidgren Network\NetTuple.cs" />
+    <Compile Include="Lidgren Network\NetUnreliableSenderChannel.cs" />
+    <Compile Include="Lidgren Network\NetUnreliableSequencedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetUnreliableUnorderedReceiver.cs" />
+    <Compile Include="Lidgren Network\NetUPnP.cs" />
+    <Compile Include="Lidgren Network\NetUtility.cs" />
+    <Compile Include="Lidgren Network\SenderChannelBase.cs" />
     <Compile Include="Network.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -67,12 +133,6 @@
     <Compile Include="Vessel.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lidgren.Network\Lidgren.Network.csproj">
-      <Project>{49ba1c69-6104-41ac-a5d8-b54fa9f696e8}</Project>
-      <Name>Lidgren.Network</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

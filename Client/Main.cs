@@ -31,7 +31,7 @@ namespace Client
                     if ((GameScenes)Application.loadedLevel == GameScenes.MAINMENU && GameStarted == false)
                         ClientNetwork.Connect(Host[1], Convert.ToInt32(Port[1]));
 
-                //ScreenMessages.PostScreenMessage("ma-ta", 5f, ScreenMessageStyle.UPPER_LEFT);
+                //ScreenMessages.PostScreenMessage("Test", 5f, ScreenMessageStyle.UPPER_LEFT);
             }
         }
 

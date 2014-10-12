@@ -72,7 +72,7 @@ namespace Client
             NetworkIncomingMessage();
         }
 
-        public static void Connect(string host, int port)
+        public static void Connect(string Host, int Port)
         {
             try
             {
@@ -84,8 +84,8 @@ namespace Client
             }
 
             NetworkClient.Start();
-            NetOutgoingMessage hail = NetworkClient.CreateMessage("Hail message!");
-            NetworkClient.Connect(host, port, hail);
+            NetOutgoingMessage OutgoingMessage = NetworkClient.CreateMessage("Outgoing message!");
+            NetworkClient.Connect(Host, Port, OutgoingMessage);
 
             Thread.Sleep(10);
 

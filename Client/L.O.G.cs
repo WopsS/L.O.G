@@ -16,10 +16,12 @@ namespace Client
             Warning = 1,
             Error = 2,
         }
+
         public static void ShowLOG(LOGType type, string text, params object[] parameters)
         {
             ShowLOG(type, false, text, parameters);
         }
+
         public static void ShowLOG(LOGType type, bool WriteLOG, string text, params object[] parameters)
         {
             switch (type)
@@ -34,6 +36,7 @@ namespace Client
                     Debug.LogError("L.O.G. Error: " + string.Format(text, parameters));
                     break;
             }
+
             if (WriteLOG == true)
             {
                 FileStream fileStream = new FileStream(LOGFileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);

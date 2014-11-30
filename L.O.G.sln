@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LOG.Client", "LOG.Client\LO
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LOG.Server", "LOG.Server\LOG.Server.csproj", "{D8E12744-449E-45BC-BE42-AAAC02D32825}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LOG.Launcher", "Launcher\LOG.Launcher.csproj", "{6E66ADF7-FE9E-4345-86FC-E168E2D9724C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LOG.Launcher", "LOG.Launcher\LOG.Launcher.csproj", "{6E66ADF7-FE9E-4345-86FC-E168E2D9724C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network", "Lidgren.Network\Lidgren.Network.csproj", "{F8793496-471D-4774-9B97-C63F5DC4A5FD}"
 EndProject

@@ -50,7 +50,7 @@ namespace LOG.Client
             //    if (ClientNetwork.NetworkClient.Status == Lidgren.Network.NetPeerStatus.Running)
                     ClientNetwork.NetworkIncomingMessage();
                 //else if (ClientNetwork.NetworkClient.Status == Lidgren.Network.NetPeerStatus.Running && ClientNetwork.isConnected == true)
-                    ClientVessel.SendVessel();
+                    //ClientVessel.SendVessel();
             //}
         }
 

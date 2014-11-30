@@ -58,20 +58,24 @@ namespace LOG.Server
 
             Console.Title = "L.O.G. Multiplayer - Server";
 
-            LOG.DisplayLOG(true, false, true, "Server started at {0}", DateTime.Now.ToString("HH:mm:ss") + ".");
+            if (Directory.Exists(Path.GetDirectoryName(Log.FilePath)) == false)
+                Directory.CreateDirectory(Path.GetDirectoryName(Log.FilePath));
 
-            if (File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "server_log.txt")) == true)
-                File.Delete(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "server_log.txt"));
+            Log.HandleLog(Log.LOGMessageTypes.Info, "Server started at", DateTime.Now.ToString("HH:mm:ss") + ".");
 
-            LOG.DisplayLOG(true, false, false, "-------------------------------------");
-            LOG.DisplayLOG(true, false, false, "Log file \"server_log.txt\" created.");
+            Log.HandleEmptyMessage();
+            
+            Log.HandleLog(Log.LOGMessageTypes.Info, "-------------------------------------");
+            Log.HandleLog(Log.LOGMessageTypes.Info, "Log file \"server_log.txt\" created.");
             LoadCfg();
-            LOG.DisplayLOG(true, false, false, "Log file \"server.cfg\" loaded.");
-            LOG.DisplayLOG(true, false, true, "-------------------------------------");
+            Log.HandleLog(Log.LOGMessageTypes.Info, "Log file \"server.cfg\" loaded.");
+            Log.HandleLog(Log.LOGMessageTypes.Info, "-------------------------------------");
+            Log.HandleEmptyMessage();
 
-            LOG.DisplayLOG(true, false, false, "L.O.G. Multiplayer Dedicated Server");
-            LOG.DisplayLOG(true, false, false, "-------------------------------------");
-            LOG.DisplayLOG(true, false, true, "Version " + Version);
+            Log.HandleLog(Log.LOGMessageTypes.Info, "L.O.G. Multiplayer Dedicated Server");
+            Log.HandleLog(Log.LOGMessageTypes.Info, "-------------------------------------");
+            Log.HandleLog(Log.LOGMessageTypes.Info, "Version " + Version);
+            Log.HandleEmptyMessage();
 
             Network.NetworkMain();
         }

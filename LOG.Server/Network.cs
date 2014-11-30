@@ -16,20 +16,23 @@ namespace LOG.Server
 
         public static void NetworkMain()
         {
-            LOG.DisplayLOG(true, true, false, "Configuring server...");
+            Log.HandleLog(Log.LOGMessageTypes.Info, "Configuring server...");
 
             Configuration = new NetPeerConfiguration("LOGMultiplayer");
             Configuration.MaximumConnections = Convert.ToInt32(ServerMain.CfgValues["maxplayers"]);
             Configuration.Port = Convert.ToInt32(ServerMain.CfgValues["port"]);
             Configuration.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
+            Configuration.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
 
-            LOG.DisplayLOG(true, true, true, "Server configured.");
-            LOG.DisplayLOG(true, true, false, "Initializing server...");
+            Log.HandleLog(Log.LOGMessageTypes.Info, true, true, true, "Server configured.");
+            Log.HandleEmptyMessage();
+            Log.HandleLog(Log.LOGMessageTypes.Info, "Initializing server...");
 
             NetworkServer = new NetServer(Configuration);
             StartServer();
 
-            LOG.DisplayLOG(true, true, true, "Server initialized.");
+            Log.HandleLog(Log.LOGMessageTypes.Info, true, true, true, "Server initialized.");
+            Log.HandleEmptyMessage();
 
             NetworkIncomingMessageThread = new Thread(NetworkIncomingMessage);
             NetworkIncomingMessageThread.Start();
@@ -60,7 +63,7 @@ namespace LOG.Server
                         case NetIncomingMessageType.VerboseDebugMessage:
 
                             string text = IncomingMessage.ReadString();
-                            LOG.DisplayLOG(true, true, text);
+                            Log.HandleLog(Log.LOGMessageTypes.Debug, text);
 
                             break;
 
@@ -69,7 +72,7 @@ namespace LOG.Server
                             NetConnectionStatus status = (NetConnectionStatus)IncomingMessage.ReadByte();
 
                             string reason = IncomingMessage.ReadString();
-                            LOG.DisplayLOG(true, true, NetUtility.ToHexString(IncomingMessage.SenderConnection.RemoteUniqueIdentifier) + " " + status + ": " + reason);
+                            Log.HandleLog(Log.LOGMessageTypes.Debug, NetUtility.ToHexString(IncomingMessage.SenderConnection.RemoteUniqueIdentifier) + " " + status + ": " + reason);
 
                             UpdateConnectionsList();
 
@@ -85,7 +88,7 @@ namespace LOG.Server
 
                         default:
 
-                            LOG.DisplayLOG(true, true, "Unhandled type: " + IncomingMessage.MessageType + " " + IncomingMessage.LengthBytes + " bytes " + IncomingMessage.DeliveryMethod + "|" + IncomingMessage.SequenceChannel);
+                            Log.HandleLog(Log.LOGMessageTypes.Error, "Unhandled type: " + IncomingMessage.MessageType + " " + IncomingMessage.LengthBytes + " bytes " + IncomingMessage.DeliveryMethod + "|" + IncomingMessage.SequenceChannel);
                             break;
                     }
 

@@ -26,7 +26,9 @@ namespace LOG.Client
             return TemporaryVesselString;
         }
 
-        public static void SendVessel()
+        #region Old Code
+
+        /*public static void SendVessel()
         {
             CreateVessel();
         }
@@ -87,7 +89,7 @@ namespace LOG.Client
             }
             catch (Exception ex)
             {
-                LOG.ShowLOG(LOG.LOGType.Error, true, true, "L.O.G. ERROR: " + ex.InnerException);
+                Log.ShowLOG(Log.LOGType.Error, true, true, "L.O.G. ERROR: " + ex.InnerException);
             }
             return "";
         }
@@ -104,7 +106,7 @@ namespace LOG.Client
                 if (HighLogic.LoadedScene != GameScenes.FLIGHT || FlightGlobals.ActiveVessel == null || !FlightGlobals.ActiveVessel.loaded || FlightGlobals.ActiveVessel.packed)
                     return;
 
-                LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#1");
+                Log.ShowLOG(Log.LOGType.Debug, true, true, "#1");
 
                 string vesselData = "";           //Data to be sent
                 string RecvMsg = String.Empty;
@@ -119,19 +121,19 @@ namespace LOG.Client
                 float RecvRotY = 0f;
                 float RecvRotZ = 0f;
 
-                LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#2");
+                Log.ShowLOG(Log.LOGType.Debug, true, true, "#2");
 
                 vessel = FlightGlobals.fetch.activeVessel;
                 pl_vessel = FlightGlobals.FindNearestControllableVessel(vessel);
 
-                LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#3");
+                Log.ShowLOG(Log.LOGType.Debug, true, true, "#3");
 
                 vesselData = ConvertVessel(vessel);
                 ClientNetwork.SendMessage(vesselData);
 
                 isCreating = true;
 
-                LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#4");
+                Log.ShowLOG(Log.LOGType.Debug, true, true, "#4");
 
                 RecvMsg = ClientNetwork.NetworkIncomingMessage();
 
@@ -141,18 +143,18 @@ namespace LOG.Client
                     return;
                 }
 
-                LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#5");
+                Log.ShowLOG(Log.LOGType.Debug, true, true, "#5");
 
                 messageParts = RecvMsg.Split(' ');
 
                 if (messageParts.Length != 10)
                 {
                     isCreating = false;
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "LOGclient: Received invalid message <" + RecvMsg + ">");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "LOGclient: Received invalid message <" + RecvMsg + ">");
                     return;
                 }
 
-                LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#6");
+                Log.ShowLOG(Log.LOGType.Debug, true, true, "#6");
 
                 RecvX = (float)double.Parse(messageParts[0], System.Globalization.CultureInfo.InvariantCulture);
                 RecvY = (float)double.Parse(messageParts[1], System.Globalization.CultureInfo.InvariantCulture);
@@ -166,48 +168,48 @@ namespace LOG.Client
                 RecvRotW = (float)double.Parse(messageParts[9], System.Globalization.CultureInfo.InvariantCulture);
                 //LOG.ShowLOG(LOG.LOGType.Debug, true, true, RecvX.ToString(), RecvY.ToString(), RecvZ.ToString(), RecvRootZ.ToString(), RecvRootY.ToString(), RecvRootZ.ToString(), RecvRotX.ToString(), RecvRotY.ToString(), RecvRotZ.ToString(), RecvRotW.ToString());
 
-                LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#7");
+                Log.ShowLOG(Log.LOGType.Debug, true, true, "#7");
 
                 if (otherPlayerConnected == false)
                 {
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.1.1");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.1.1");
 
                     prebuild_pos = vessel.GetWorldPos3D();
                     vessel.GoOffRails();
                     BuildVessel();
                     vessel.GoOnRails();
 
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.1.2");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.1.2");
 
                     //FlightGlobals flightGlobals = new FlightGlobals();
                     vessel = FlightGlobals.ActiveVessel;
 
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.1.2.1");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.1.2.1");
                     pl_vessel = FlightGlobals.FindNearestControllableVessel(vessel); //after building, the vessels have to be set new.
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.1.2.2");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.1.2.2");
                     pl_vessel.SetPosition(vessel.mainBody.position - new Vector3d(RecvRootX, RecvRootY, RecvRootZ) + new Vector3d(RecvX, RecvY, RecvZ));
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.1.2.3");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.1.2.3");
                     pl_vessel.SetWorldVelocity(new Vector3d(0, 0, 0));
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.1.2.4");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.1.2.4");
                     vessel.SetWorldVelocity(new Vector3d(0, 0, 0));
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.1.2.5");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.1.2.5");
                     vessel.SetPosition(prebuild_pos);
                     pl_vessel.useGUILayout = true;
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.1.3");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.1.3");
                 }
                 else
                 {
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.2.1");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.2.1");
 
                     pl_vessel.SetPosition(vessel.mainBody.position - new Vector3d(RecvRootX, RecvRootY, RecvRootZ) + new Vector3d(RecvX, RecvY, RecvZ));
                     pl_vessel.SetRotation(new Quaternion(RecvRotX, RecvRotY, RecvRotZ, RecvRotW));
 
-                    LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#8.2.2");
+                    Log.ShowLOG(Log.LOGType.Debug, true, true, "#8.2.2");
 
                     pl_vessel.SetWorldVelocity(new Vector3d(0, 0, 0));
                 }
 
-                LOG.ShowLOG(LOG.LOGType.Debug, true, true, "#9");
+                Log.ShowLOG(Log.LOGType.Debug, true, true, "#9");
 
                 RecvMsg = null;
                 isCreating = false;
@@ -216,13 +218,15 @@ namespace LOG.Client
             catch (UnityException e)
             {
                 isCreating = false;
-                LOG.ShowLOG(LOG.LOGType.Error, true, true, "UnityException: ", e.InnerException.ToString());
+                Log.ShowLOG(Log.LOGType.Error, true, true, "UnityException: ", e.InnerException.ToString());
             }
             catch (Exception e)
             {
                 isCreating = false;
-                LOG.ShowLOG(LOG.LOGType.Error, true, true, "Exception: ", e.InnerException.ToString());
+                Log.ShowLOG(Log.LOGType.Error, true, true, "Exception: ", e.InnerException.ToString());
             }
-        }
+        }*/
+
+        #endregion
     }
 }

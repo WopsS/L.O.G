@@ -1,7 +1,4 @@
 ﻿using Lidgren.Network;
-using LOG.API;
-using LOG.API.Networking;
-using LOG.API.Networking.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,22 +40,22 @@ namespace LOG.Client
                     case NetIncomingMessageType.WarningMessage:
                     case NetIncomingMessageType.VerboseDebugMessage:
 
-                        NetIMResult = IncomingMessage.ReadString();
-                        LOG.ShowLOG(LOG.LOGType.Debug, true, NetIMResult);
+                        string DebugMessage = IncomingMessage.ReadString();
+                        Log.HandleLog(Log.LOGMessageTypes.Debug, DebugMessage);
 
                         break;
                     case NetIncomingMessageType.StatusChanged:
 
-                        NetConnectionStatus status = (NetConnectionStatus)IncomingMessage.ReadByte();
+                        NetConnectionStatus Status = (NetConnectionStatus)IncomingMessage.ReadByte();
 
-                        if (status == NetConnectionStatus.Connected)
-                            isConnected = true;
+                        string StatusMessage = IncomingMessage.ReadString();
 
-                        else
-                            isConnected = false;
+                        //if (Status == NetConnectionStatus.Connected)
+                            //ClientMain.playerManagers.isConnected = true;
+                        //else if (Status == NetConnectionStatus.Disconnected)
+                          //  Application.Quit();
 
-                        NetIMResult = IncomingMessage.ReadString();
-                        LOG.ShowLOG(LOG.LOGType.Debug, true, status.ToString() + ": " + NetIMResult);
+                        Log.HandleLog(Log.LOGMessageTypes.Info, true, true, true, Status.ToString() + ": " + StatusMessage);
 
                         break;
                     case NetIncomingMessageType.Data:
@@ -68,7 +65,7 @@ namespace LOG.Client
                         break;
                     default:
 
-                        LOG.ShowLOG(LOG.LOGType.Debug, true, "Unhandled type: " + IncomingMessage.MessageType + " " + IncomingMessage.LengthBytes + " bytes");
+                        Log.HandleLog(Log.LOGMessageTypes.Error, "Unhandled type: " + IncomingMessage.MessageType + " " + IncomingMessage.LengthBytes + " bytes");
 
                         break;
                 }

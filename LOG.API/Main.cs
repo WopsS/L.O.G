@@ -7,6 +7,6 @@ namespace LOG.API
 {
     public class APIMain
     {
-        public static string Version = "0.1.1";
+        public static readonly string Version = "0.1.1";
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Launcher
+﻿namespace LOG.Launcher
 {
     partial class AddServer
     {

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Launcher
+namespace LOG.Launcher
 {
     public partial class AddServer : Form
     {
@@ -20,22 +20,16 @@ namespace Launcher
 
         private void AddServerButton_Click(object sender, EventArgs e)
         {
-            if(ServerIPText.TextLength <= 0 && ServerPortText.TextLength <= 0)
+            if (ServerIPText.TextLength <= 0 && ServerPortText.TextLength <= 0)
                 this.Close();
 
-            if (!File.Exists(Program.main.ServerListPath))
-                File.Create(Program.main.ServerListPath);
+            if (Program.main.LoadingServersWorker.IsBusy == true)
+                Program.main.LoadingServersWorker.CancelAsync();
 
             File.AppendAllText(Program.main.ServerListPath, string.Format("{0}:{1}", ServerIPText.Text, ServerPortText.Text) + Environment.NewLine);
 
-            if (Program.main.LoadingServersWorker.IsBusy == false)
-            {
-                ServerInfo.ServerDetail.Clear();
-                Program.main.ListOfServers.Rows.Clear();
-
-                if (new FileInfo(Program.main.ServerListPath).Length != 0)
-                    Program.main.LoadingServersWorker.RunWorkerAsync();
-            }
+            ServerInfo.ServerDetail.Clear();
+            Program.main.LoadingServersWorker.RunWorkerAsync();
 
             this.Close();
         }

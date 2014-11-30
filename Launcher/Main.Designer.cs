@@ -1,4 +1,4 @@
-﻿namespace Launcher
+﻿namespace LOG.Launcher
 {
     partial class Main
     {
@@ -34,7 +34,7 @@
             this.panel5 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.NameLabel = new System.Windows.Forms.Label();
-            this.PlayerNameBox = new System.Windows.Forms.TextBox();
+            this.UserNameBox = new System.Windows.Forms.TextBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.RefreshButton = new System.Windows.Forms.Button();
             this.DeleteButton = new System.Windows.Forms.Button();
@@ -42,12 +42,12 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.PlayButton = new System.Windows.Forms.Button();
             this.ListOfServers = new System.Windows.Forms.DataGridView();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.LoadingServersWorker = new System.ComponentModel.BackgroundWorker();
             this.HostName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Players = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Ping = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.LoadingServersWorker = new System.ComponentModel.BackgroundWorker();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ListOfServers)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -60,7 +60,7 @@
             this.panel1.Controls.Add(this.panel5);
             this.panel1.Controls.Add(this.panel4);
             this.panel1.Controls.Add(this.NameLabel);
-            this.panel1.Controls.Add(this.PlayerNameBox);
+            this.panel1.Controls.Add(this.UserNameBox);
             this.panel1.Controls.Add(this.panel3);
             this.panel1.Controls.Add(this.RefreshButton);
             this.panel1.Controls.Add(this.DeleteButton);
@@ -106,12 +106,12 @@
             this.NameLabel.TabIndex = 6;
             this.NameLabel.Text = "Name:";
             // 
-            // PlayerNameBox
+            // UserNameBox
             // 
-            this.PlayerNameBox.Location = new System.Drawing.Point(274, 8);
-            this.PlayerNameBox.Name = "PlayerNameBox";
-            this.PlayerNameBox.Size = new System.Drawing.Size(123, 20);
-            this.PlayerNameBox.TabIndex = 5;
+            this.UserNameBox.Location = new System.Drawing.Point(274, 8);
+            this.UserNameBox.Name = "UserNameBox";
+            this.UserNameBox.Size = new System.Drawing.Size(123, 20);
+            this.UserNameBox.TabIndex = 5;
             // 
             // panel3
             // 
@@ -196,6 +196,24 @@
             this.ListOfServers.TabIndex = 1;
             this.ListOfServers.Click += new System.EventHandler(this.ListOfServers_Click);
             // 
+            // HostName
+            // 
+            this.HostName.HeaderText = "HostName";
+            this.HostName.Name = "HostName";
+            this.HostName.ReadOnly = true;
+            // 
+            // Players
+            // 
+            this.Players.HeaderText = "Players";
+            this.Players.Name = "Players";
+            this.Players.ReadOnly = true;
+            // 
+            // Ping
+            // 
+            this.Ping.HeaderText = "Ping";
+            this.Ping.Name = "Ping";
+            this.Ping.ReadOnly = true;
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -218,24 +236,6 @@
             // 
             this.LoadingServersWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.LoadingServersWorker_DoWork);
             this.LoadingServersWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.LoadingServersWorker_RunWorkerCompleted);
-            // 
-            // HostName
-            // 
-            this.HostName.HeaderText = "HostName";
-            this.HostName.Name = "HostName";
-            this.HostName.ReadOnly = true;
-            // 
-            // Players
-            // 
-            this.Players.HeaderText = "Players";
-            this.Players.Name = "Players";
-            this.Players.ReadOnly = true;
-            // 
-            // Ping
-            // 
-            this.Ping.HeaderText = "Ping";
-            this.Ping.Name = "Ping";
-            this.Ping.ReadOnly = true;
             // 
             // Main
             // 
@@ -273,7 +273,7 @@
         private System.Windows.Forms.Button RefreshButton;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Label NameLabel;
-        private System.Windows.Forms.TextBox PlayerNameBox;
+        private System.Windows.Forms.TextBox UserNameBox;
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Panel panel6;

@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{25F4E93C-7D08-410B-85F2-151B077AB095}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LOG.Client", "LOG.Client\LOG.Client.csproj", "{25F4E93C-7D08-410B-85F2-151B077AB095}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{D8E12744-449E-45BC-BE42-AAAC02D32825}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LOG.Server", "LOG.Server\LOG.Server.csproj", "{D8E12744-449E-45BC-BE42-AAAC02D32825}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher", "Launcher\Launcher.csproj", "{6E66ADF7-FE9E-4345-86FC-E168E2D9724C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LOG.Launcher", "Launcher\LOG.Launcher.csproj", "{6E66ADF7-FE9E-4345-86FC-E168E2D9724C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network", "Lidgren.Network\Lidgren.Network.csproj", "{F8793496-471D-4774-9B97-C63F5DC4A5FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LOG.API", "LOG.API\LOG.API.csproj", "{C2DD446E-0D4A-4187-93C9-69E87FD50F2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{F8793496-471D-4774-9B97-C63F5DC4A5FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8793496-471D-4774-9B97-C63F5DC4A5FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8793496-471D-4774-9B97-C63F5DC4A5FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2DD446E-0D4A-4187-93C9-69E87FD50F2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2DD446E-0D4A-4187-93C9-69E87FD50F2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2DD446E-0D4A-4187-93C9-69E87FD50F2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2DD446E-0D4A-4187-93C9-69E87FD50F2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-namespace Server
+namespace LOG.Server
 {
     public class ServerMain
     {
@@ -60,8 +60,11 @@ namespace Server
 
             LOG.DisplayLOG(true, false, true, "Server started at {0}", DateTime.Now.ToString("HH:mm:ss") + ".");
 
+            if (File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "server_log.txt")) == true)
+                File.Delete(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "server_log.txt"));
+
             LOG.DisplayLOG(true, false, false, "-------------------------------------");
-            LOG.DisplayLOG(true, false, false, "Log file \"server_log.txt\" loaded.");
+            LOG.DisplayLOG(true, false, false, "Log file \"server_log.txt\" created.");
             LoadCfg();
             LOG.DisplayLOG(true, false, false, "Log file \"server.cfg\" loaded.");
             LOG.DisplayLOG(true, false, true, "-------------------------------------");

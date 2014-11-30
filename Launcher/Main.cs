@@ -13,7 +13,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Reflection;
 
-namespace Launcher
+namespace LOG.Launcher
 {
     public partial class Main : Form
     {
@@ -22,6 +22,39 @@ namespace Launcher
         private string ServerIP = null, ServerPort = null;
 
         private DataTable DT = new DataTable();
+
+        static bool is64BitProcess = (IntPtr.Size == 8);
+        static bool is64BitOperatingSystem = is64BitProcess || InternalCheckIsWow64();
+
+        #region Get Informations About Windows
+        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsWow64Process(
+            [In] IntPtr hProcess,
+            [Out] out bool wow64Process
+        );
+
+        public static bool InternalCheckIsWow64()
+        {
+            if ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1) ||
+                Environment.OSVersion.Version.Major >= 6)
+            {
+                using (Process p = Process.GetCurrentProcess())
+                {
+                    bool retVal;
+                    if (!IsWow64Process(p.Handle, out retVal))
+                    {
+                        return false;
+                    }
+                    return retVal;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        #endregion
 
         public Main()
         {
@@ -37,10 +70,7 @@ namespace Launcher
             if (!Directory.Exists(LOGDirectory))
                 Directory.CreateDirectory(LOGDirectory);
 
-            if (!File.Exists(ServerListPath))
-                File.Create(ServerListPath);
-
-            if (new FileInfo(ServerListPath).Length != 0)
+            if (File.Exists(ServerListPath) == true && new FileInfo(ServerListPath).Length != 0)
             {
                 LauncherNetwork.FirstLaunch();
                 LoadingServersWorker.RunWorkerAsync();
@@ -53,7 +83,12 @@ namespace Launcher
             ServerPort = ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Port.ToString();
 
             if (ServerIP.Length > 0 && ServerPort.Length > 0)
-                Process.Start(Path.Combine(KSPDirectory, "KSP.exe"), string.Format("-IP={0} -Port={1}", ServerIP, ServerPort));
+            {
+                if (is64BitOperatingSystem == true)
+                    Process.Start(Path.Combine(KSPDirectory, "KSP_x64.exe"), string.Format("-IP={0} -Port={1} -Username={2}", ServerIP, ServerPort, UserNameBox.Text));
+                else
+                    Process.Start(Path.Combine(KSPDirectory, "KSP.exe"), string.Format("-IP={0} -Port={1} -Username={2}", ServerIP, ServerPort, UserNameBox.Text));
+            }
         }
 
         private void AddButton_Click(object sender, EventArgs e)
@@ -61,7 +96,7 @@ namespace Launcher
             if (Program.addserver.IsDisposed == true)
                 Program.addserver = new AddServer();
 
-            Program.addserver.Show();
+            Program.addserver.ShowDialog(this);
         }
 
         private void RefreshButton_Click(object sender, EventArgs e)
@@ -84,7 +119,8 @@ namespace Launcher
 
         private void LoadingServersWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            ListOfServers.Rows[0].Selected = true;
+            if(ListOfServers.RowCount > 0)
+                ListOfServers.Rows[0].Selected = true;
         }
 
         private void ListOfServers_Click(object sender, EventArgs e)
@@ -94,6 +130,9 @@ namespace Launcher
 
         public void LoadServerList()
         {
+            if (ListOfServers.RowCount > 0)
+                ListOfServers.Rows.Clear();
+
             int i, j;
 
             Dictionary<string, string> ResponseParts = new Dictionary<string, string>();

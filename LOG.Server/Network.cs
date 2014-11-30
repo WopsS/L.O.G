@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Server
+namespace LOG.Server
 {
     class Network
     {
@@ -79,15 +79,7 @@ namespace Server
 
                             string chat = IncomingMessage.ReadString();
 
-                            List<NetConnection> all = NetworkServer.Connections; 
-                            all.Remove(IncomingMessage.SenderConnection);
-
-                            if (all.Count > 0)
-                            {
-                                NetOutgoingMessage om = NetworkServer.CreateMessage();
-                                om.Write(NetUtility.ToHexString(IncomingMessage.SenderConnection.RemoteUniqueIdentifier) + " said: " + chat);
-                                NetworkServer.SendMessage(om, all, NetDeliveryMethod.ReliableOrdered, 0);
-                            }
+                            SendMessage(chat, IncomingMessage.SenderConnection);
 
                             break;
 
@@ -96,6 +88,7 @@ namespace Server
                             LOG.DisplayLOG(true, true, "Unhandled type: " + IncomingMessage.MessageType + " " + IncomingMessage.LengthBytes + " bytes " + IncomingMessage.DeliveryMethod + "|" + IncomingMessage.SequenceChannel);
                             break;
                     }
+
                     NetworkServer.Recycle(IncomingMessage);
                 }
 
@@ -123,16 +116,39 @@ namespace Server
             NetworkServer.Shutdown("Requested by user");
         }
 
-        static void ReadServerCommand()
+        private static void ReadServerCommand()
         {
             string input = Console.ReadLine();
 
             if (!string.IsNullOrWhiteSpace(input))
             {
-                // Do something with this commands.
+                string[] Result = input.Split(new char[] { ' ' }, 2);
+
+                if(Result[0] == "/send")
+                {
+                    SendMessageToAll(Result[1]);
+                }
             }
 
             ReadServerCommand();
+        }
+
+        private static void SendMessage(string Message, NetConnection Connection)
+        {
+            List<NetConnection> all = NetworkServer.Connections;
+            all.Remove(Connection);
+
+            if (all.Count > 0)
+            {
+                NetOutgoingMessage om = NetworkServer.CreateMessage(Message);
+                NetworkServer.SendMessage(om, all, NetDeliveryMethod.ReliableOrdered, 0);
+            }
+        }
+
+        private static void SendMessageToAll(string Message)
+        {
+            NetOutgoingMessage om = NetworkServer.CreateMessage(Message);
+            NetworkServer.SendToAll(om, null, NetDeliveryMethod.ReliableOrdered, 0);
         }
     }
 }

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("L.O.G. Multiplayer")]
+[assembly: AssemblyTitle("LOG.API")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("L.O.G. Multiplayer")]
+[assembly: AssemblyProduct("LOG.API")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ad3edb54-bb38-44c7-a087-bcb397ba39de")]
+[assembly: Guid("e306ef34-96d8-40e9-b665-00d1b9f8aa3c")]
 
 // Version information for an assembly consists of the following four values:
 //

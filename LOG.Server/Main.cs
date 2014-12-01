@@ -1,4 +1,6 @@
 ﻿using Lidgren.Network;
+using LOG.API.IO.Log;
+using LOG.Server.Networking;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -39,7 +41,7 @@ namespace LOG.Server
                 case CtrlType.CTRL_SHUTDOWN_EVENT:
                 case CtrlType.CTRL_CLOSE_EVENT:
                 default:
-                    Network.Shutdown();
+                    Network.netServer.Shutdown("Requested by user.");
                     return false;
             }
         }
@@ -61,39 +63,65 @@ namespace LOG.Server
             if (Directory.Exists(Path.GetDirectoryName(Log.FilePath)) == false)
                 Directory.CreateDirectory(Path.GetDirectoryName(Log.FilePath));
 
-            Log.HandleLog(Log.LOGMessageTypes.Info, "Server started at", DateTime.Now.ToString("HH:mm:ss") + ".");
+            Log.HandleLog(LOGMessageTypes.Info, "Server started at", DateTime.Now.ToString("HH:mm:ss") + ".");
 
             Log.HandleEmptyMessage();
             
-            Log.HandleLog(Log.LOGMessageTypes.Info, "-------------------------------------");
-            Log.HandleLog(Log.LOGMessageTypes.Info, "Log file \"server_log.txt\" created.");
+            Log.HandleLog(LOGMessageTypes.Info, "-------------------------------------");
+            Log.HandleLog(LOGMessageTypes.Info, "Log file \"server_log.txt\" created.");
             LoadCfg();
-            Log.HandleLog(Log.LOGMessageTypes.Info, "Log file \"server.cfg\" loaded.");
-            Log.HandleLog(Log.LOGMessageTypes.Info, "-------------------------------------");
+            Log.HandleLog(LOGMessageTypes.Info, "Config file \"server.cfg\" loaded.");
+            Log.HandleLog(LOGMessageTypes.Info, "-------------------------------------");
             Log.HandleEmptyMessage();
 
-            Log.HandleLog(Log.LOGMessageTypes.Info, "L.O.G. Multiplayer Dedicated Server");
-            Log.HandleLog(Log.LOGMessageTypes.Info, "-------------------------------------");
-            Log.HandleLog(Log.LOGMessageTypes.Info, "Version " + Version);
+            Log.HandleLog(LOGMessageTypes.Info, "L.O.G. Multiplayer Dedicated Server");
+            Log.HandleLog(LOGMessageTypes.Info, "-------------------------------------");
+            Log.HandleLog(LOGMessageTypes.Info, "Version " + Version);
             Log.HandleEmptyMessage();
 
-            Network.NetworkMain();
+            Network.Initialize();
         }
 
+        /// <summary>
+        /// Load Cfg file.
+        /// </summary>
         private static void LoadCfg()
         {
-            if(!File.Exists(CfgPath))
-                File.WriteAllText(CfgPath, "Server Config..." + Environment.NewLine + "maxplayers 30" + Environment.NewLine + "port 4198" + Environment.NewLine + string.Format("hostname L.O.G. {0} Server", Version));
+            if (!File.Exists(CfgPath))
+                CreateCfg();
 
             string[] CfgText = File.ReadAllLines(CfgPath), CurrentKey;
 
             for (int i = 0; i < CfgText.Length; i++)
             {
+                if (CfgText[i].Length == 0)
+                    continue;
+
                 CurrentKey = CfgText[i].Split(new char[] { ' ' }, 2);
                 CfgValues.Add(CurrentKey[0], CurrentKey[1]);
             }
+
+            if (!CfgValues.ContainsKey("maxplayers") || !CfgValues.ContainsKey("port") || !CfgValues.ContainsKey("hostname"))
+            {
+                Log.HandleLog(LOGMessageTypes.Info, "Config file \"server.cfg\" isn't correct, create a new one.");
+                CreateCfg();
+                CfgValues.Clear();
+                LoadCfg();
+            }
         }
 
+        /// <summary>
+        /// Create default cfg file.
+        /// </summary>
+        private static void CreateCfg()
+        {
+            string[] DefaultConfig = { "Server Config...", "", "maxplayers 100", "port 4198", string.Format("hostname L.O.G. {0} Server", Version) };
+            File.WriteAllLines(CfgPath, DefaultConfig);
+        }
+
+        /// <summary>
+        /// Get current version of server.
+        /// </summary>
         public static string Version
         {
             get

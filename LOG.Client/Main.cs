@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LOG.Client.Networking.Managers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -10,8 +11,7 @@ namespace LOG.Client
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     class ClientMain : MonoBehaviour
     {
-        public static bool GameStarted = false;
-        public static string Username = null;
+        // TODO: Chat messages.
 
         public void Awake()
         {
@@ -20,46 +20,47 @@ namespace LOG.Client
             CheckFiles();
         }
 
-        private void FirstRun()
+        private void Main()
         {
-            string[] Arguments = Environment.GetCommandLineArgs(), Host, Port;
+            string[] Arguments = Environment.GetCommandLineArgs();
 
             if (Array.Exists(Arguments, element => element.StartsWith("-IP=")) == true && Array.Exists(Arguments, element => element.StartsWith("-Port=")) == true && Array.Exists(Arguments, element => element.StartsWith("-Username=")) == true)
             {
-                Host = Arguments[1].Split('=');
-                Port = Arguments[2].Split('=');
-                Username = Arguments[3].Split('=')[1];
+                string Host, Port;
+
+                Host = Arguments[1].Split('=')[1];
+                Port = Arguments[2].Split('=')[1];
+                PlayerManager.Username = Arguments[3].Split('=')[1];
 
                 if (Host.Length > 0 && Port.Length > 0)
-                    ClientNetwork.Connect(Host[1], Port[1]);
-
-                //ScreenMessages.PostScreenMessage("Test", 5f, ScreenMessageStyle.UPPER_LEFT);
+                {
+                    ClientNetwork.Initialize(Host, Port);
+                }
             }
         }
 
         public void Update()
         {
-            if (HighLogic.LoadedScene == GameScenes.MAINMENU && ClientNetwork.isConnected == false)
-                FirstRun();
+            if (PlayerManager.isConnected == true && PlayerManager.GameStarted == false && HighLogic.LoadedScene == GameScenes.MAINMENU)
+                StartGame();
+
         }
 
         public void FixedUpdate()
         {
-            //if (ClientNetwork.NetworkClient != null)
-            //{
-            //    if (ClientNetwork.NetworkClient.Status == Lidgren.Network.NetPeerStatus.Running)
-                    ClientNetwork.NetworkIncomingMessage();
-                //else if (ClientNetwork.NetworkClient.Status == Lidgren.Network.NetPeerStatus.Running && ClientNetwork.isConnected == true)
-                    //ClientVessel.SendVessel();
-            //}
+
         }
 
         void OnApplicationQuit()
         {
-            if (ClientNetwork.isConnected == true)
+            if (PlayerManager.isConnected == true)
                 ClientNetwork.Shutdown();
 
-            //ClientNetwork.NetworkIncomingMessageThread.Abort();
+            if (ClientNetwork.NetworkIMThread.IsAlive == true)
+                ClientNetwork.NetworkIMThread.Abort();
+
+            if (ClientNetwork.NetworkMessagesThread.IsAlive == true)
+                ClientNetwork.NetworkMessagesThread.Abort();
         }
 
         public static void StartGame()
@@ -88,27 +89,23 @@ namespace LOG.Client
             GamePersistence.SaveGame(HighLogic.CurrentGame, "persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE);
             HighLogic.CurrentGame.Start();
 
-            GameStarted = true;
+            PlayerManager.GameStarted = true;
         }
 
         private void CheckFiles()
         {
+            CheckIfDirectoryExist(Path.Combine(Path.Combine(KSPUtil.ApplicationRootPath, "L.O.G"), "logs"));
+
             string SaveDirectory = Path.Combine(KSPUtil.ApplicationRootPath, Path.Combine("saves", "L.O.G"));
             CheckIfDirectoryExist(SaveDirectory);
 
-            using (Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LOG.Client.Resources.DefaultSaveGame.sfs"))
+            using (Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LOG.Client.Utilities.Resources.DefaultSaveGame.sfs"))
             using (StreamReader reader = new StreamReader(resourceStream))
                 File.WriteAllText(Path.Combine(SaveDirectory, "persistent.sfs"), reader.ReadToEnd());
 
             CheckIfDirectoryExist(Path.Combine(SaveDirectory, "Ships"));
             CheckIfDirectoryExist(Path.Combine(SaveDirectory, Path.Combine("Ships", "VAB")));
             CheckIfDirectoryExist(Path.Combine(SaveDirectory, Path.Combine("Ships", "SPH")));
-
-            if (File.Exists(Path.Combine(KSPUtil.ApplicationRootPath, "client_log.txt")) == true)
-            {
-                File.Delete(Path.Combine(KSPUtil.ApplicationRootPath, "client_log.txt"));
-                File.Create(Path.Combine(KSPUtil.ApplicationRootPath, "client_log.txt"));
-            }
         }
 
         private void CheckIfDirectoryExist(string Path)

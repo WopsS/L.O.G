@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LOG.API.IO.Log;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,14 +12,6 @@ namespace LOG.Client
     {
         public static string FilePath = Path.Combine(Path.Combine(Path.Combine(Environment.CurrentDirectory, "L.O.G"), "logs"), String.Format("log_{0}.log", DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss")));
         private static string Result = String.Empty;
-
-        public enum LOGMessageTypes : int
-        {
-            Info = 0,
-            Debug = 1,
-            Warning = 2,
-            Error = 3
-        }
 
         /// <summary>
         /// Write log to the file.
@@ -53,7 +46,7 @@ namespace LOG.Client
             Result = String.Empty;
 
             foreach (object Parameter in Parameters)
-                Result += Parameter + " ";
+                Result += Parameter.ToString() + " ";
 
             if (toConsole == true)
             {

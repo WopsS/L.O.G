@@ -42,6 +42,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\Jocuri\Steam\SteamApps\common\Kerbal Space Program\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Lidgren.Network, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lidgren-network-gen3\Lidgren.Network\bin\Debug\Lidgren.Network.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -54,7 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logger.cs" />
-    <Compile Include="Network.cs" />
+    <Compile Include="Networking\Network.cs" />
+    <Compile Include="Networking\Managers\PlayerManager.cs" />
+    <Compile Include="Networking\Managers\VesselManager.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -62,43 +68,31 @@
     </Compile>
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Unity Threading\Dispatcher.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Unity Threading\Task.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Unity Threading\TaskDistributer.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Unity Threading\Thread.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Unity Threading\UnityThreadHelper.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Vessel.cs" />
+    <Compile Include="Utilities\Unity Threading\Dispatcher.cs" />
+    <Compile Include="Utilities\Unity Threading\Task.cs" />
+    <Compile Include="Utilities\Unity Threading\TaskDistributer.cs" />
+    <Compile Include="Utilities\Unity Threading\Thread.cs" />
+    <Compile Include="Utilities\Unity Threading\UnityThreadHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\DefaultSaveGame.sfs" />
+    <EmbeddedResource Include="Utilities\Resources\DefaultSaveGame.sfs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lidgren.Network\Lidgren.Network.csproj">
-      <Project>{f8793496-471d-4774-9b97-c63f5dc4a5fd}</Project>
-      <Name>Lidgren.Network</Name>
-    </ProjectReference>
     <ProjectReference Include="..\LOG.API\LOG.API.csproj">
       <Project>{c2dd446e-0d4a-4187-93c9-69e87fd50f2a}</Project>
       <Name>LOG.API</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Utilities\Unity Threading\README.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

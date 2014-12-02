@@ -92,6 +92,9 @@ namespace LOG.Client
             PlayerManager.GameStarted = true;
         }
 
+        /// <summary>
+        /// Check if necessary files exist.
+        /// </summary>
         private void CheckFiles()
         {
             CheckIfDirectoryExist(Path.Combine(Path.Combine(KSPUtil.ApplicationRootPath, "L.O.G"), "logs"));
@@ -108,6 +111,10 @@ namespace LOG.Client
             CheckIfDirectoryExist(Path.Combine(SaveDirectory, Path.Combine("Ships", "SPH")));
         }
 
+        /// <summary>
+        /// Check if a specific directory exist.
+        /// </summary>
+        /// <param name="Path">Path to the directory.</param>
         private void CheckIfDirectoryExist(string Path)
         {
             if (Directory.Exists(Path))

@@ -38,7 +38,7 @@ namespace LOG.Client.Networking.Managers
             ClientNetwork.SendMessage(netOutgoingMessage);
         }
 
-        public static void HandleVesselMessage(IGameMessage Message, NetConnection SenderConnection)
+        public static void HandleVesselMessage(IGameMessage Message)
         {
             if (HighLogic.LoadedScene != GameScenes.FLIGHT)
                 return;
@@ -48,7 +48,7 @@ namespace LOG.Client.Networking.Managers
             ConfigNode currentNode = new ConfigNode(vesselMessage.Data); // Create a new ConfigNode with vessel data recevied.
             ProtoVessel protoVessel = new ProtoVessel(currentNode, HighLogic.CurrentGame); // Create a new ProtoVessel from ConfigNode.
 
-            //UnityThreadHelperExtended.Dispatcher.Dispatch(() => Log.HandleLog(API.IO.Log.LOGMessageTypes.Debug, "aha"));
+            UnityThreadHelperExtended.Dispatcher.Dispatch(() => Log.HandleLog(API.IO.Log.LOGMessageTypes.Debug, "Ulalala, I got the message!"));
 
             // TODO: Create new vessels in game and update them.
         }

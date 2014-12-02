@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -46,6 +46,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="Networking\Interfaces\IGameMessage.cs" />
     <Compile Include="Networking\MessageHandler.cs" />
+    <Compile Include="Networking\Messages\DiscoveryRequestMessage.cs" />
     <Compile Include="Networking\Messages\GameMessageTypes.cs" />
     <Compile Include="Networking\Messages\HandShakeMessage.cs" />
     <Compile Include="Networking\Messages\VesselMessage.cs" />

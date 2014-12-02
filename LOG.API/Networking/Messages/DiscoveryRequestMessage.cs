@@ -1,5 +1,6 @@
 ﻿using Lidgren.Network;
 using LOG.API.Networking.Interfaces;
+using LOG.API.Networking.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,12 @@ using System.Text;
 
 namespace LOG.API.Networking.Messages
 {
-    public class VesselMessage : IGameMessage
+    public class DiscoveryRequestMessage : IGameMessage
     {
         /// <summary>
         /// Class constructor without parameters.
         /// </summary>
-        public VesselMessage()
+        public DiscoveryRequestMessage()
         {
 
         }
@@ -21,32 +22,37 @@ namespace LOG.API.Networking.Messages
         /// Class constructor with parameters and decode message.
         /// </summary>
         /// <param name="Message">Message to be decoded.</param>
-        public VesselMessage(NetIncomingMessage Message)
+        public DiscoveryRequestMessage(NetIncomingMessage Message)
         {
             DecodeMessage(Message);
         }
 
         /// <summary>
-        /// Get or set ID of the vessel.
+        /// Get or set hostname received from the server.
         /// </summary>
-        public string ID { get; set; }
+        public string Hostname { get; set; }
 
         /// <summary>
-        /// Get or set name of the vessel.
+        /// Get or set players number received from the server.
         /// </summary>
-        public string Name { get; set; }
+        public int Players { get; set; }
 
         /// <summary>
-        /// Get or set data about vessel.
+        /// Get or set maximum players received from the server.
         /// </summary>
-        public string Data { get; set; }
+        public int MaximumPlayers { get; set; }
+
+        /// <summary>
+        /// Get or set ping calculated by client or server.
+        /// </summary>
+        public int Ping { get; set; }
 
         /// <summary>
         /// Get message type.
         /// </summary>
         public GameMessageTypes MessageType
         {
-            get { return GameMessageTypes.UpdateVesseState; }
+            get { return GameMessageTypes.DiscoveryState; }
         }
 
         /// <summary>
@@ -55,9 +61,9 @@ namespace LOG.API.Networking.Messages
         /// <param name="Message">Message to be decode.</param>
         public void DecodeMessage(NetIncomingMessage Message)
         {
-            ID = Message.ReadString();
-            Name = Message.ReadString();
-            Data = Message.ReadString();
+            Hostname = Message.ReadString();
+            Players = Message.ReadInt32();
+            MaximumPlayers = Message.ReadInt32();
         }
 
         /// <summary>
@@ -66,9 +72,9 @@ namespace LOG.API.Networking.Messages
         /// <param name="Message">Message to be encode.</param>
         public void EncodeMessage(NetOutgoingMessage Message)
         {
-            Message.Write(ID);
-            Message.Write(Name);
-            Message.Write(Data);
+            Message.Write(Hostname);
+            Message.Write(Players);
+            Message.Write(MaximumPlayers);
         }
     }
 }

@@ -7,9 +7,10 @@ namespace LOG.API.Networking.Messages
 {
     public enum GameMessageTypes : byte
     {
+        DiscoveryState,
+        HandShakeState,
         ChatTextState,
         UpdatePlayerState,
-        UpdateVesseState,
-        HandShakeState
+        UpdateVesseState
     }
 }

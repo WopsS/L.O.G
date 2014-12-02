@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace LOG.Server
 {
-    class Log
+    static class Log
     {
-        public static string FilePath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "logs"), String.Format("log_{0}.log", DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss")));
+        public static readonly string FilePath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "logs"), String.Format("log_{0}.log", DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss")));
         private static string Result = String.Empty;
 
         /// <summary>
@@ -56,35 +56,63 @@ namespace LOG.Server
                     case LOGMessageTypes.Info:
 
                         if (newLine == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.White;
                             Console.WriteLine(String.Format("{0}", Result));
+                            Console.ResetColor();
+                        }
                         else
+                        {
+                            Console.ForegroundColor = ConsoleColor.White;
                             Console.Write(String.Format("{0}", Result));
+                            Console.ResetColor();
+                        }
 
                         break;
                     case LOGMessageTypes.Warning:
 
                         if (newLine == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Gray;
                             Console.WriteLine(String.Format("{0}", Result));
+                            Console.ResetColor();
+                        }
                         else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Gray;
                             Console.Write(String.Format("{0}", Result));
+                            Console.ResetColor();
+                        }
 
                         break;
                     case LOGMessageTypes.Error:
 
                         if (newLine == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine(String.Format("{0}", Result));
+                            Console.ResetColor();
+                        }
                         else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.Write(String.Format("{0}", Result));
+                            Console.ResetColor();
+                        }
 
                         break;
                 }
             }
 
+            ServerMain.CheckIfDirectory(Path.GetDirectoryName(Log.FilePath));
+
             if (toFile == true)
                 File.AppendAllText(FilePath, String.Format("[{0}][{1}]: {2}", DateTime.Now.ToString("HH:mm:ss"), MessageType.ToString(), Result) + (newLine == true ? Environment.NewLine : String.Empty));
         }
 
-
+        /// <summary>
+        /// Write an empty line to log file and to console.
+        /// </summary>
         public static void HandleEmptyMessage()
         {
             Console.WriteLine();

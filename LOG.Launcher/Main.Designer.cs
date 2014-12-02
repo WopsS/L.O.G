@@ -112,6 +112,7 @@
             this.UserNameBox.Name = "UserNameBox";
             this.UserNameBox.Size = new System.Drawing.Size(123, 20);
             this.UserNameBox.TabIndex = 5;
+            this.UserNameBox.MouseLeave += new System.EventHandler(this.UserNameBox_MouseLeave);
             // 
             // panel3
             // 

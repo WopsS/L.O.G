@@ -21,10 +21,10 @@ namespace LOG.Server.Networking
          */
 
         public static NetServer netServer;
-        private static NetPeerConfiguration Configuration;
+        private static readonly NetPeerConfiguration Configuration = new NetPeerConfiguration("LOGMultiplayer");
 
-        private static Thread NetworkIMThread = new Thread(NetworkIncomingMessage);
-        private static MessageHandler messageHandler = new MessageHandler();
+        private static readonly Thread NetworkIMThread = new Thread(NetworkIncomingMessage);
+        public static Dictionary<NetConnection, SessionManager> Sessions = new Dictionary<NetConnection, SessionManager>();
 
         /// <summary>
         /// Initialize server.
@@ -33,7 +33,6 @@ namespace LOG.Server.Networking
         {
             Log.HandleLog(LOGMessageTypes.Info, "Configuring server...");
 
-            Configuration = new NetPeerConfiguration("LOGMultiplayer");
             Configuration.MaximumConnections = Convert.ToInt32(ServerMain.CfgValues["maxplayers"]);
             Configuration.Port = Convert.ToInt32(ServerMain.CfgValues["port"]);
             Configuration.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
@@ -51,8 +50,6 @@ namespace LOG.Server.Networking
 
             NetworkIMThread.Start(); // Start NetworkIMThread thread.
 
-            messageHandler.OnVesselUpdateState += VesselManager.HandleVesselUpdateState;
-
             ReadServerCommand();
         }
 
@@ -66,10 +63,18 @@ namespace LOG.Server.Networking
                     switch (IncomingMessage.MessageType)
                     {
                         case NetIncomingMessageType.DiscoveryRequest:
-                            NetOutgoingMessage response = netServer.CreateMessage();
-                            response.Write(string.Format("HostName:{0}#Players:{1}#MaxPlayers:{2}", ServerMain.CfgValues["hostname"], netServer.Connections.Count, Convert.ToInt32(ServerMain.CfgValues["maxplayers"])));
+                            NetOutgoingMessage ResponseMessage = netServer.CreateMessage();
 
-                            netServer.SendDiscoveryResponse(response, IncomingMessage.SenderEndPoint);
+                            IGameMessage gameMessage = new DiscoveryRequestMessage
+                            {
+                                Hostname = ServerMain.CfgValues["hostname"],
+                                Players = netServer.Connections.Count,
+                                MaximumPlayers = Convert.ToInt32(ServerMain.CfgValues["maxplayers"])
+                            };
+
+                            gameMessage.EncodeMessage(ResponseMessage);
+
+                            netServer.SendDiscoveryResponse(ResponseMessage, IncomingMessage.SenderEndPoint);
                             break;
                         case NetIncomingMessageType.DebugMessage:
                         case NetIncomingMessageType.ErrorMessage:
@@ -79,26 +84,39 @@ namespace LOG.Server.Networking
                             Log.HandleLog(LOGMessageTypes.Debug, text);
                             break;
                         case NetIncomingMessageType.StatusChanged:
-                            NetConnectionStatus status = (NetConnectionStatus)IncomingMessage.ReadByte();
+                            NetConnectionStatus Status = (NetConnectionStatus)IncomingMessage.ReadByte();
 
-                            string reason = IncomingMessage.ReadString();
-                            Log.HandleLog(LOGMessageTypes.Debug, NetUtility.ToHexString(IncomingMessage.SenderConnection.RemoteUniqueIdentifier) + " " + status + ": " + reason);
+                            switch(Status)
+                            { 
+                                case NetConnectionStatus.RespondedConnect:
+                                    Log.HandleLog(LOGMessageTypes.Info, "Incoming connection from", IncomingMessage.SenderEndPoint);
+                                    break;
+                                case NetConnectionStatus.Connected:
+                                    Log.HandleLog(LOGMessageTypes.Info, Sessions[IncomingMessage.SenderConnection].Username, "has joined the server");
+                                    break;
+                                case NetConnectionStatus.Disconnected:
+                                    Log.HandleLog(LOGMessageTypes.Info, Sessions[IncomingMessage.SenderConnection].Username, "has left the server");
+                                    break;
+                            }
                             break;
                         case NetIncomingMessageType.ConnectionApproval:
-                            // Check if GameMessageTypes is Handshake.
-                            GameMessageTypes opcode = (GameMessageTypes)IncomingMessage.SenderConnection.RemoteHailMessage.ReadByte();
-                            if (opcode != GameMessageTypes.HandShakeState)
+                            GameMessageTypes gameMessageType = (GameMessageTypes)IncomingMessage.SenderConnection.RemoteHailMessage.ReadByte();
+
+                            if (gameMessageType != GameMessageTypes.HandShakeState)
                                 break;
 
-                            HandShakeMessage msg = new HandShakeMessage(IncomingMessage.SenderConnection.RemoteHailMessage);
+                            HandShakeMessage Message = new HandShakeMessage(IncomingMessage.SenderConnection.RemoteHailMessage);
 
-                            if (msg.Version == APIMain.Version && msg.Username != null && msg.Username.Length > 0)
+                            if (Message.Version == APIMain.Version && Message.Username != null && Message.Username.Length > 0)
+                            {
                                 IncomingMessage.SenderConnection.Approve(netServer.CreateMessage());
+                                Sessions.Add(IncomingMessage.SenderConnection, new SessionManager(IncomingMessage.SenderConnection, Message.Username));
+                            }
                             else
-                                IncomingMessage.SenderConnection.Deny("Wrong version !");
+                                IncomingMessage.SenderConnection.Deny("Wrong version or username!");
                             break;
                         case NetIncomingMessageType.Data:
-                            messageHandler.Handle(IncomingMessage, IncomingMessage.SenderConnection);
+                            Sessions[IncomingMessage.SenderConnection].messageHandler.Handle(IncomingMessage);
                             break;
 
                         default:
@@ -134,30 +152,22 @@ namespace LOG.Server.Networking
         }
 
         /// <summary>
-        /// Send message to all connected clients except sender of the message.
-        /// </summary>
-        /// <param name="Message">Message to be send.</param>
-        /// <param name="Connection">NetConnection of sender.</param>
-        private static void SendMessage(string Message, NetConnection Connection)
-        {
-            List<NetConnection> all = netServer.Connections;
-            all.Remove(Connection);
-
-            if (all.Count > 0)
-            {
-                NetOutgoingMessage om = netServer.CreateMessage(Message);
-                netServer.SendMessage(om, all, NetDeliveryMethod.ReliableOrdered, 0);
-            }
-        }
-
-        /// <summary>
         /// Send message to all connected clients.
         /// </summary>
         /// <param name="Message">Message to be send.</param>
         private static void SendMessageToAll(string Message)
         {
-            NetOutgoingMessage om = netServer.CreateMessage(Message);
-            netServer.SendToAll(om, null, NetDeliveryMethod.ReliableOrdered, 0);
+            try
+            {
+                NetOutgoingMessage om = netServer.CreateMessage(Message);
+                netServer.SendToAll(om, null, NetDeliveryMethod.ReliableOrdered, 0);
+            }
+            catch (Exception e)
+            {
+                Log.HandleEmptyMessage();
+                Log.HandleLog(LOGMessageTypes.Error, e.ToString());
+                Log.HandleEmptyMessage();
+            }
         }
     }
 }

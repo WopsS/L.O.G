@@ -10,7 +10,7 @@ namespace LOG.Client
 {
     class Log
     {
-        public static string FilePath = Path.Combine(Path.Combine(Path.Combine(Environment.CurrentDirectory, "L.O.G"), "logs"), String.Format("log_{0}.log", DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss")));
+        public static readonly string FilePath = Path.Combine(Path.Combine(Path.Combine(Environment.CurrentDirectory, "L.O.G"), "logs"), String.Format("log_{0}.log", DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss")));
         private static string Result = String.Empty;
 
         /// <summary>
@@ -67,6 +67,14 @@ namespace LOG.Client
 
             if (toFile == true)
                 File.AppendAllText(FilePath, String.Format("[{0}][{1}]: {2}", DateTime.Now.ToString("dd/MM/yy HH:mm:ss"), MessageType.ToString(), Result) + Environment.NewLine);
+        }
+
+        /// <summary>
+        /// Write an empty line to log file.
+        /// </summary>
+        public static void HandleEmptyMessage()
+        {
+            File.AppendAllText(FilePath, Environment.NewLine);
         }
     }
 }

@@ -12,19 +12,19 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Reflection;
+using LOG.API.Networking.Messages;
 
 namespace LOG.Launcher
 {
     public partial class Main : Form
     {
         public string KSPDirectory, LOGDirectory, ServerListPath;
-        
+        public DiscoveryRequestMessage DiscoveryMessage;
+       
         private string ServerIP = null, ServerPort = null;
 
-        private DataTable DT = new DataTable();
-
-        static bool is64BitProcess = (IntPtr.Size == 8);
-        static bool is64BitOperatingSystem = is64BitProcess || InternalCheckIsWow64();
+        private static bool is64BitProcess = (IntPtr.Size == 8);
+        private static bool is64BitOperatingSystem = is64BitProcess || InternalCheckIsWow64();
 
         #region Get Informations About Windows
         [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
@@ -63,6 +63,13 @@ namespace LOG.Launcher
             KSPDirectory = Application.StartupPath;
             LOGDirectory = Path.Combine(KSPDirectory, "L.O.G");
             ServerListPath = Path.Combine(LOGDirectory, "ServerList.list");
+
+            if(Properties.Settings.Default.UpgradeRequired == true)
+            {
+                Properties.Settings.Default.Upgrade();
+                Properties.Settings.Default.UpgradeRequired = false;
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -72,13 +79,19 @@ namespace LOG.Launcher
 
             if (File.Exists(ServerListPath) == true && new FileInfo(ServerListPath).Length != 0)
             {
-                LauncherNetwork.FirstLaunch();
+                Network.Initialize();
                 LoadingServersWorker.RunWorkerAsync();
             }
         }
 
         public void PlayButton_Click(object sender, EventArgs e)
         {
+            if (UserNameBox.Text.Length == 0)
+            {
+                MessageBox.Show("Username can't be empty!");
+                return;
+            }
+
             ServerIP = ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].IPAddress;
             ServerPort = ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Port.ToString();
 
@@ -131,72 +144,52 @@ namespace LOG.Launcher
         public void LoadServerList()
         {
             if (ListOfServers.RowCount > 0)
-                ListOfServers.Rows.Clear();
+                ListOfServers.Invoke(new MethodInvoker(() => ListOfServers.Rows.Clear()));
 
-            int i, j;
+            string[] ServerList = File.ReadAllLines(ServerListPath), Server;
 
-            Dictionary<string, string> ResponseParts = new Dictionary<string, string>();
-
-            string[] ServerList = File.ReadAllLines(ServerListPath), Server, ResponseMessageParts, ResponseFinalParts;
-
-            for (i = 0; i < ServerList.Length; i++)
+            for (int i = 0; i < ServerList.Length; i++)
             {
                 Server = ServerList[i].Split(':');
 
-                string DiscoveredServerResponse = LauncherNetwork.DiscoverServers(Server[0], Convert.ToInt32(Server[1]));
+                Network.DiscoverServers(Server[0], Convert.ToInt32(Server[1]));
 
-                ResponseMessageParts = DiscoveredServerResponse.Split('#');
-
-                for (j = 0; j < ResponseMessageParts.Length; j++)
-                {
-                    ResponseFinalParts = ResponseMessageParts[j].Split(':');
-                    ResponseParts.Add(ResponseFinalParts[0], ResponseFinalParts[1]);
-                }
-                
                 ServerInfo.ServerDetail.Add(new ServerInfo()
                 {
                     IPAddress = Server[0],
                     Port = Convert.ToInt32(Server[1]),
-                    HostName = ResponseParts["HostName"],
-                    Players = Convert.ToInt32(ResponseParts["Players"]),
-                    MaxPlayers = Convert.ToInt32(ResponseParts["MaxPlayers"]),
-                    Ping = Convert.ToInt32(ResponseParts["Ping"])
+                    Hostname = this.DiscoveryMessage.Hostname,
+                    Players = this.DiscoveryMessage.Players,
+                    MaximumPlayers = this.DiscoveryMessage.MaximumPlayers,
+                    Ping = this.DiscoveryMessage.Ping
                 });
-
-                ResponseParts = new Dictionary<string, string>();
             }
 
-            foreach (ServerInfo serverinfo in ServerInfo.ServerDetail)
-                ListOfServers.Invoke(new MethodInvoker(() => ListOfServers.Rows.Add(serverinfo.HostName, serverinfo.Players + " / " + serverinfo.MaxPlayers, serverinfo.Ping)));
+            foreach (ServerInfo serverinfo in ServerInfo.ServerDetail) // Do that because we don't want server to be added one by one.
+                ListOfServers.Invoke(new MethodInvoker(() => ListOfServers.Rows.Add(serverinfo.Hostname, serverinfo.Players + " / " + serverinfo.MaximumPlayers, serverinfo.Ping)));
         }
 
         private void RefreshServerInfo()
         {
             if (ListOfServers.SelectedRows.Count > 0)
             {
-                Dictionary<string, string> ResponseParts = new Dictionary<string, string>();
+                Network.DiscoverServers(ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].IPAddress, Convert.ToInt32(ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Port));
 
+                ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Hostname = this.DiscoveryMessage.Hostname;
+                ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Players = this.DiscoveryMessage.Players;
+                ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].MaximumPlayers = this.DiscoveryMessage.MaximumPlayers;
+                ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Ping = this.DiscoveryMessage.Ping;
 
-                string[] ResponseMessageParts, ResponseFinalParts;
-                string DiscoveredServerResponse = LauncherNetwork.DiscoverServers(ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].IPAddress, Convert.ToInt32(ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Port));
-
-                ResponseMessageParts = DiscoveredServerResponse.Split('#');
-
-                for (int i = 0; i < ResponseMessageParts.Length; i++)
-                {
-                    ResponseFinalParts = ResponseMessageParts[i].Split(':');
-                    ResponseParts.Add(ResponseFinalParts[0], ResponseFinalParts[1]);
-                }
-
-                ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].HostName = ResponseParts["HostName"];
-                ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Players = Convert.ToInt32(ResponseParts["Players"]);
-                ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].MaxPlayers = Convert.ToInt32(ResponseParts["MaxPlayers"]);
-                ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Ping = Convert.ToInt32(ResponseParts["Ping"]);
-
-                ListOfServers.SelectedRows[0].Cells[0].Value = ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].HostName;
-                ListOfServers.SelectedRows[0].Cells[1].Value = ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Players + " / " + ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].MaxPlayers;
+                ListOfServers.SelectedRows[0].Cells[0].Value = ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Hostname;
+                ListOfServers.SelectedRows[0].Cells[1].Value = ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Players + " / " + ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].MaximumPlayers;
                 ListOfServers.SelectedRows[0].Cells[2].Value = ServerInfo.ServerDetail[ListOfServers.CurrentCell.RowIndex].Ping;
             }
+        }
+
+        private void UserNameBox_MouseLeave(object sender, EventArgs e)
+        {
+            Properties.Settings.Default["Username"] = UserNameBox.Text;
+            Properties.Settings.Default.Save();
         }
     }
 }

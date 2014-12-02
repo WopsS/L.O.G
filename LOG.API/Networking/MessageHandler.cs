@@ -10,7 +10,7 @@ namespace LOG.API.Networking
 {
     public class MessageHandler
     {
-        public delegate void PacketHandlerDelegate(IGameMessage message, NetConnection Connection = null);
+        public delegate void PacketHandlerDelegate(IGameMessage message);
 
         public event PacketHandlerDelegate OnVesselUpdateState;
 
@@ -18,14 +18,14 @@ namespace LOG.API.Networking
         /// Handle message and choose what to do with it.
         /// </summary>
         /// <param name="Message">Message to handle.</param>
-        public void Handle(NetIncomingMessage Message, NetConnection Connection = null)
+        public void Handle(NetIncomingMessage Message)
         {
             GameMessageTypes gameMessage = (GameMessageTypes)Message.ReadByte();
 
             switch (gameMessage)
             {
                 case GameMessageTypes.UpdateVesseState:
-                    OnVesselUpdateState(new VesselMessage(Message), Connection);
+                    OnVesselUpdateState(new VesselMessage(Message));
                     break;
             }
         }

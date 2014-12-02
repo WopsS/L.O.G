@@ -48,7 +48,8 @@ namespace LOG.Server
 
         #endregion
 
-        static string CfgPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "server.cfg");
+        private static string CfgPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "server.cfg");
+
         public static Dictionary<string, string> CfgValues = new Dictionary<string, string>();
 
         static void Main(string[] args)
@@ -60,8 +61,7 @@ namespace LOG.Server
 
             Console.Title = "L.O.G. Multiplayer - Server";
 
-            if (Directory.Exists(Path.GetDirectoryName(Log.FilePath)) == false)
-                Directory.CreateDirectory(Path.GetDirectoryName(Log.FilePath));
+            CheckIfDirectory(Path.GetDirectoryName(Log.FilePath));
 
             Log.HandleLog(LOGMessageTypes.Info, "Server started at", DateTime.Now.ToString("HH:mm:ss") + ".");
 
@@ -117,6 +117,18 @@ namespace LOG.Server
         {
             string[] DefaultConfig = { "Server Config...", "", "maxplayers 100", "port 4198", string.Format("hostname L.O.G. {0} Server", Version) };
             File.WriteAllLines(CfgPath, DefaultConfig);
+        }
+
+        /// <summary>
+        /// Check if directory exist.
+        /// </summary>
+        /// <param name="Path"></param>
+        public static void CheckIfDirectory(string Path)
+        {
+            if (Directory.Exists(Path))
+                return;
+
+            Directory.CreateDirectory(Path);
         }
 
         /// <summary>

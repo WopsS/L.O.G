@@ -51,8 +51,8 @@
   <ItemGroup>
     <Compile Include="IO\Logger.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="Networking\Managers\VesselManager.cs" />
-    <Compile Include="Networking\Network.cs" />
+    <Compile Include="Network.cs" />
+    <Compile Include="Networking\Managers\SessionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

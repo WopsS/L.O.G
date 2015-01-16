@@ -67,7 +67,12 @@ namespace LOG.API.Networking.Messages
         /// Get or set server endpoint.
         /// NOTE: This never will be sent in an encoded message!
         /// </summary>
-        public IPEndPoint[]  IPendPoint  { get; set; }
+        public IPEndPoint[] IPendPoint { get; set; }
+
+        /// <summary>
+        /// Get or set time when the server is registred and updated every time.
+        /// </summary>
+        public double LastRegistred { get; set; }
 
         /// <summary>
         /// Get or set message type.
@@ -87,6 +92,8 @@ namespace LOG.API.Networking.Messages
             Players = netIncomingMessage.ReadInt32();
             MaximumPlayers = netIncomingMessage.ReadInt32();
             Ping = netIncomingMessage.ReadInt32();
+
+            LastRegistred = netIncomingMessage.ReadTime(true);
         }
 
         /// <summary>
@@ -104,6 +111,8 @@ namespace LOG.API.Networking.Messages
             netOutgoingMessage.Write(Players);
             netOutgoingMessage.Write(MaximumPlayers);
             netOutgoingMessage.Write(Ping);
+
+            netOutgoingMessage.Write(NetTime.Now);
         }
     }
 }

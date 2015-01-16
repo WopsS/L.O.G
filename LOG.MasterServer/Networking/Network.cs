@@ -18,7 +18,7 @@ namespace LOG.MasterServer.Networking
     {
         public NetPeer netPeer;
         private NetPeerConfiguration netPeerConfiguration = new NetPeerConfiguration("LOGMasterServer");
-        private Thread UpdateThread = null;
+        private Thread UpdateThread = null, UpdateServerlistThread = null;
 
         /// <summary>
         /// Keep registred servers and informations about them.
@@ -36,8 +36,11 @@ namespace LOG.MasterServer.Networking
             netPeer = new NetPeer(netPeerConfiguration);
             netPeer.Start();
 
-            UpdateThread = new Thread(HandleMessage);
+            UpdateThread = new Thread(Update);
             UpdateThread.Start();
+
+            UpdateServerlistThread = new Thread(UpdateServerList);
+            UpdateServerlistThread.Start();
         }
 
         /// <summary>
@@ -49,97 +52,122 @@ namespace LOG.MasterServer.Networking
             netPeer.Shutdown("Shutdown!");
         }
 
+        private void Update()
+        {
+            while (!Console.KeyAvailable || Console.ReadKey().Key != ConsoleKey.Escape)
+            {
+                this.HandleMessage();
+
+                Thread.Sleep(30);
+            }
+        }
+
         /// <summary>
         /// Handle messages from server or client and choose what to do with them.
         /// </summary>
         private void HandleMessage()
         {
-            while (!Console.KeyAvailable || Console.ReadKey().Key != ConsoleKey.Escape)
+            NetIncomingMessage netIncomingMessage;
+
+            while ((netIncomingMessage = netPeer.ReadMessage()) != null)
             {
-                NetIncomingMessage netIncomingMessage;
-
-                while ((netIncomingMessage = netPeer.ReadMessage()) != null)
+                switch (netIncomingMessage.MessageType)
                 {
-                    switch (netIncomingMessage.MessageType)
-                    {
-                        case NetIncomingMessageType.UnconnectedData:
-                            switch ((ServerMessageTypes)netIncomingMessage.ReadByte())
-                            {
-                                case ServerMessageTypes.RegisterHost:
-                                    ServerMessage serverMessage = new ServerMessage(netIncomingMessage); // Decode server message.
+                    case NetIncomingMessageType.UnconnectedData:
+                        switch ((ServerMessageTypes)netIncomingMessage.ReadByte())
+                        {
+                            case ServerMessageTypes.RegisterHost:
+                                ServerMessage serverMessage = new ServerMessage(netIncomingMessage); // Decode server message.
 
-                                    serverMessage.IPendPoint = new IPEndPoint[]
+                                serverMessage.IPendPoint = new IPEndPoint[]
                                         {
                                             netIncomingMessage.ReadIPEndPoint(),
 										    netIncomingMessage.SenderEndPoint
                                         };
-                                    if (RegistredServers.ContainsKey(serverMessage.ID) == true)
-                                        RegistredServers.Add(serverMessage.ID, serverMessage);
-                                    else
-                                        RegistredServers[serverMessage.ID] = serverMessage;
 
-                                    Log.HandleLog(LOGMessageTypes.Info, "Got registration for host", String.Format("{0}.", serverMessage.ID));
-                                    break;
+                                if (RegistredServers.ContainsKey(serverMessage.ID) == true)
+                                    RegistredServers.Add(serverMessage.ID, serverMessage);
+                                else
+                                    RegistredServers[serverMessage.ID] = serverMessage;
 
-                                case ServerMessageTypes.RequestHostList:
-                                    Log.HandleLog(LOGMessageTypes.Info, "Sending list of", RegistredServers.Count, "hosts to client", String.Format("{0}.", netIncomingMessage.SenderEndPoint));
+                                Log.HandleLog(LOGMessageTypes.Info, "Got registration for host", String.Format("{0}.", serverMessage.ID));
+                                break;
 
-                                    foreach (KeyValuePair<long, ServerMessage> RegistredServer in this.RegistredServers)
+                            case ServerMessageTypes.RequestHostList:
+                                Log.HandleLog(LOGMessageTypes.Info, "Sending list of", RegistredServers.Count, "hosts to client", String.Format("{0}.", netIncomingMessage.SenderEndPoint));
+
+                                foreach (KeyValuePair<long, ServerMessage> RegistredServer in this.RegistredServers)
+                                {
+                                    NetOutgoingMessage netOutgoingMessage = netPeer.CreateMessage();
+
+                                    IServerMessage IserverMessage = new ServerMessage
                                     {
-                                        NetOutgoingMessage netOutgoingMessage = netPeer.CreateMessage();
+                                        ID = RegistredServer.Value.ID,
+                                        IPAddress = RegistredServer.Value.IPAddress,
+                                        Port = RegistredServer.Value.Port,
+                                        Hostname = RegistredServer.Value.Hostname,
+                                        Players = RegistredServer.Value.Players,
+                                        MaximumPlayers = RegistredServer.Value.MaximumPlayers,
 
-                                        IServerMessage IserverMessage = new ServerMessage
-                                        {
-                                            ID = RegistredServer.Value.ID,
-                                            IPAddress = RegistredServer.Value.IPAddress,
-                                            Port = RegistredServer.Value.Port,
-                                            Hostname = RegistredServer.Value.Hostname,
-                                            Players = RegistredServer.Value.Players,
-                                            MaximumPlayers = RegistredServer.Value.MaximumPlayers,
+                                        Ping = 0,
+                                        IPendPoint = null,
+                                        MessageType = ServerMessageTypes.RequestHostList
+                                    };
 
-                                            Ping = 0,
-                                            IPendPoint = null,
-                                            MessageType = ServerMessageTypes.RequestHostList
-                                        };
+                                    IserverMessage.EncodeMessage(netOutgoingMessage); // Encode message.
 
-                                        IserverMessage.EncodeMessage(netOutgoingMessage); // Encode message.
+                                    netPeer.SendUnconnectedMessage(netOutgoingMessage, netIncomingMessage.SenderEndPoint); // Send encoded message to client.
+                                }
+                                break;
+                            case ServerMessageTypes.RequestIntroduction:
+                                IPEndPoint clientInternal = netIncomingMessage.ReadIPEndPoint();
+                                long ServerID = netIncomingMessage.ReadInt64();
+                                string Token = netIncomingMessage.ReadString();
 
-                                        netPeer.SendUnconnectedMessage(netOutgoingMessage, netIncomingMessage.SenderEndPoint); // Send encoded message to client.
-                                    }
-                                    break;
-                                case ServerMessageTypes.RequestIntroduction:
-                                    IPEndPoint clientInternal = netIncomingMessage.ReadIPEndPoint();
-                                    long ServerID = netIncomingMessage.ReadInt64();
-                                    string Token = netIncomingMessage.ReadString();
+                                Log.HandleLog(LOGMessageTypes.Info, netIncomingMessage.SenderEndPoint, "requesting introduction to", ServerID, String.Format("(token{0}).", Token));
 
-                                    Log.HandleLog(LOGMessageTypes.Info, netIncomingMessage.SenderEndPoint, "requesting introduction to", ServerID, String.Format("(token{0}).", Token));
+                                if (this.RegistredServers.ContainsKey(ServerID))
+                                {
+                                    Log.HandleLog(LOGMessageTypes.Info, "Sending introduction...");
 
-                                    if (this.RegistredServers.ContainsKey(ServerID))
-                                    {
-                                        Log.HandleLog(LOGMessageTypes.Info, "Sending introduction...");
+                                    netPeer.Introduce(this.RegistredServers[ServerID].IPendPoint[0], this.RegistredServers[ServerID].IPendPoint[1], clientInternal, netIncomingMessage.SenderEndPoint, Token);
+                                }
+                                else
+                                    Console.WriteLine("Client requested introduction to nonlisted host!");
+                                break;
+                        }
+                        break;
 
-                                        netPeer.Introduce(this.RegistredServers[ServerID].IPendPoint[0], this.RegistredServers[ServerID].IPendPoint[1], clientInternal, netIncomingMessage.SenderEndPoint, Token);
-                                    }
-                                    else
-                                        Console.WriteLine("Client requested introduction to nonlisted host!");
-                                    break;
-                            }
-                            break;
+                    case NetIncomingMessageType.DebugMessage:
+                    case NetIncomingMessageType.VerboseDebugMessage:
+                        Log.HandleLog(LOGMessageTypes.Debug, netIncomingMessage.ReadString());
+                        break;
+                    case NetIncomingMessageType.WarningMessage:
+                        Log.HandleLog(LOGMessageTypes.Warning, netIncomingMessage.ReadString());
+                        break;
+                    case NetIncomingMessageType.ErrorMessage:
+                        Log.HandleLog(LOGMessageTypes.Error, netIncomingMessage.ReadString());
+                        break;
+                }
+            }
+        }
 
-                        case NetIncomingMessageType.DebugMessage:
-                        case NetIncomingMessageType.VerboseDebugMessage:
-                            Log.HandleLog(LOGMessageTypes.Debug, netIncomingMessage.ReadString());
-                            break;
-                        case NetIncomingMessageType.WarningMessage:
-                            Log.HandleLog(LOGMessageTypes.Warning, netIncomingMessage.ReadString());
-                            break;
-                        case NetIncomingMessageType.ErrorMessage:
-                            Log.HandleLog(LOGMessageTypes.Error, netIncomingMessage.ReadString());
-                            break;
+        /// <summary>
+        /// Update the server list in another thread because if there will be to much servers online it will take sometime to check all servers. 
+        /// </summary>
+        private void UpdateServerList()
+        {
+            while (!Console.KeyAvailable || Console.ReadKey().Key != ConsoleKey.Escape)
+            {
+                foreach (KeyValuePair<long, ServerMessage> RegistredServer in RegistredServers.ToList())
+                {
+                    if (RegistredServer.Value.LastRegistred < NetTime.Now - 120)
+                    {
+                        RegistredServers.Remove(RegistredServer.Key);
                     }
                 }
 
-                Thread.Sleep(1);
+                Thread.Sleep(120);
             }
         }
     }

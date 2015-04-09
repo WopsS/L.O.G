@@ -63,17 +63,26 @@ namespace LOG.Server.Networking
                 switch (netIncomingMessage.MessageType)
                 {
                     case NetIncomingMessageType.UnconnectedData:
-                        // ...
+                        {
+                            // ...
+                            break;
+                        }
                     case NetIncomingMessageType.DebugMessage:
                     case NetIncomingMessageType.VerboseDebugMessage:
-                        Log.HandleLog(LOGMessageTypes.Debug, netIncomingMessage.ReadString());
-                        break;
+                        {
+                            Log.HandleLog(LOGMessageTypes.Debug, netIncomingMessage.ReadString());
+                            break;
+                        }
                     case NetIncomingMessageType.WarningMessage:
-                        Log.HandleLog(LOGMessageTypes.Warning, netIncomingMessage.ReadString());
-                        break;
+                        {
+                            Log.HandleLog(LOGMessageTypes.Warning, netIncomingMessage.ReadString());
+                            break;
+                        }
                     case NetIncomingMessageType.ErrorMessage:
-                        Log.HandleLog(LOGMessageTypes.Error, netIncomingMessage.ReadString());
-                        break;
+                        {
+                            Log.HandleLog(LOGMessageTypes.Error, netIncomingMessage.ReadString());
+                            break;
+                        }
                 }
             }
         }

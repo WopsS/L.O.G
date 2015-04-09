@@ -28,8 +28,10 @@ namespace LOG.API.Networking
             switch (gameMessage)
             {
                 default:
-                    Log.HandleLog(LOGMessageTypes.Error, "Unhandled game message type " + gameMessage);
-                    break;
+                    {
+                        Log.HandleLog(LOGMessageTypes.Error, "Unhandled game message type " + gameMessage);
+                        break;
+                    }
             }
         }
 

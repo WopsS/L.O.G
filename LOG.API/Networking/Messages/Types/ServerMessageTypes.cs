@@ -12,6 +12,7 @@ namespace LOG.API.Networking.Messages.Types
     {
         RegisterHost,
         RequestHostList,
-        RequestIntroduction
+        RequestIntroduction,
+        RequestPing
     }
 }

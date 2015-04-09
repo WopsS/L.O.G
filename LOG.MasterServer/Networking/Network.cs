@@ -14,42 +14,60 @@ using System.Threading;
 
 namespace LOG.MasterServer.Networking
 {
-    internal class Network
+    internal class Network : IDisposable
     {
-        public NetPeer netPeer;
-        private NetPeerConfiguration netPeerConfiguration = new NetPeerConfiguration("LOGMasterServer");
-        private Thread UpdateThread = null, UpdateServerlistThread = null;
+        public NetPeer m_netPeer;
+        private NetPeerConfiguration m_netPeerConfiguration = new NetPeerConfiguration("LOGMasterServer");
+        private Thread m_updateThread = null, m_updateServersListThread = null;
+        private bool m_disposed;
 
         /// <summary>
         /// Keep registred servers and informations about them.
         /// </summary>
-        private Dictionary<long, ServerMessage> RegistredServers = new Dictionary<long, ServerMessage>();
+        private Dictionary<long, ServerMessage> m_registredServers = new Dictionary<long, ServerMessage>();
 
         /// <summary>
         /// Start local network peer.  
         /// </summary>
         public Network()
         {
-            netPeerConfiguration.SetMessageTypeEnabled(NetIncomingMessageType.UnconnectedData, true);
-            netPeerConfiguration.Port = APIMain.MasterServerPort;
+            m_netPeerConfiguration.SetMessageTypeEnabled(NetIncomingMessageType.UnconnectedData, true);
+            m_netPeerConfiguration.Port = APIMain.MasterServerPort;
 
-            netPeer = new NetPeer(netPeerConfiguration);
-            netPeer.Start();
+            m_netPeer = new NetPeer(m_netPeerConfiguration);
+            m_netPeer.Start();
 
-            UpdateThread = new Thread(Update);
-            UpdateThread.Start();
+            m_updateThread = new Thread(Update);
+            m_updateThread.Start();
 
-            UpdateServerlistThread = new Thread(UpdateServerList);
-            UpdateServerlistThread.Start();
+            m_updateServersListThread = new Thread(UpdateServerList);
+            m_updateServersListThread.Start();
         }
 
         /// <summary>
         /// Cleanup network statements.
         /// </summary>
-        ~Network()
+        public void Dispose()
         {
-            UpdateThread.Abort();
-            netPeer.Shutdown("Shutdown!");
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Cleanup network statements.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (m_disposed)
+                return;
+
+            if (disposing)
+            {
+                this.m_updateThread.Abort();
+                this.m_netPeer.Shutdown("Shutdown!");
+            }
+
+            m_disposed = true;
         }
 
         private void Update()
@@ -69,7 +87,7 @@ namespace LOG.MasterServer.Networking
         {
             NetIncomingMessage netIncomingMessage;
 
-            while ((netIncomingMessage = netPeer.ReadMessage()) != null)
+            while ((netIncomingMessage = m_netPeer.ReadMessage()) != null)
             {
                 switch (netIncomingMessage.MessageType)
                 {
@@ -87,21 +105,25 @@ namespace LOG.MasterServer.Networking
 										    netIncomingMessage.SenderEndPoint
                                         };
 
-                                        if (RegistredServers.ContainsKey(serverMessage.ID) == true)
-                                            RegistredServers.Add(serverMessage.ID, serverMessage);
+                                        if (m_registredServers.ContainsKey(serverMessage.ID) == false)
+                                        {
+                                            m_registredServers.Add(serverMessage.ID, serverMessage);
+                                        }
                                         else
-                                            RegistredServers[serverMessage.ID] = serverMessage;
+                                        {
+                                            m_registredServers[serverMessage.ID] = serverMessage;
+                                        }
 
                                         Log.HandleLog(LOGMessageTypes.Info, "Got registration for host", String.Format("{0}.", serverMessage.ID));
                                         break;
                                     }
                                 case ServerMessageTypes.RequestHostList:
                                     {
-                                        Log.HandleLog(LOGMessageTypes.Info, "Sending list of", RegistredServers.Count, "hosts to client", String.Format("{0}.", netIncomingMessage.SenderEndPoint));
+                                        Log.HandleLog(LOGMessageTypes.Info, "Sending list of", m_registredServers.Count, "hosts to client", String.Format("{0}.", netIncomingMessage.SenderEndPoint));
 
-                                        foreach (KeyValuePair<long, ServerMessage> RegistredServer in this.RegistredServers)
+                                        foreach (KeyValuePair<long, ServerMessage> RegistredServer in this.m_registredServers)
                                         {
-                                            NetOutgoingMessage netOutgoingMessage = netPeer.CreateMessage();
+                                            NetOutgoingMessage netOutgoingMessage = m_netPeer.CreateMessage();
 
                                             IServerMessage IserverMessage = new ServerMessage
                                             {
@@ -119,7 +141,7 @@ namespace LOG.MasterServer.Networking
 
                                             IserverMessage.EncodeMessage(netOutgoingMessage); // Encode message.
 
-                                            netPeer.SendUnconnectedMessage(netOutgoingMessage, netIncomingMessage.SenderEndPoint); // Send encoded message to client.
+                                            m_netPeer.SendUnconnectedMessage(netOutgoingMessage, netIncomingMessage.SenderEndPoint); // Send encoded message to client.
                                         }
                                         break;
                                     }
@@ -131,11 +153,11 @@ namespace LOG.MasterServer.Networking
 
                                         Log.HandleLog(LOGMessageTypes.Info, netIncomingMessage.SenderEndPoint, "requesting introduction to", ServerID, String.Format("(token{0}).", Token));
 
-                                        if (this.RegistredServers.ContainsKey(ServerID))
+                                        if (this.m_registredServers.ContainsKey(ServerID))
                                         {
                                             Log.HandleLog(LOGMessageTypes.Info, "Sending introduction...");
 
-                                            netPeer.Introduce(this.RegistredServers[ServerID].IPendPoint[0], this.RegistredServers[ServerID].IPendPoint[1], clientInternal, 
+                                            m_netPeer.Introduce(this.m_registredServers[ServerID].IPendPoint[0], this.m_registredServers[ServerID].IPendPoint[1], clientInternal, 
                                                 netIncomingMessage.SenderEndPoint, Token);
                                         }
                                         else
@@ -173,11 +195,11 @@ namespace LOG.MasterServer.Networking
         {
             while (!Console.KeyAvailable || Console.ReadKey().Key != ConsoleKey.Escape)
             {
-                foreach (KeyValuePair<long, ServerMessage> RegistredServer in RegistredServers.ToList())
+                foreach (KeyValuePair<long, ServerMessage> RegistredServer in m_registredServers.ToList())
                 {
-                    if (RegistredServer.Value.LastRegistred < NetTime.Now - 120)
+                    if (RegistredServer.Value.LastRegistredTime < NetTime.Now - 120)
                     {
-                        RegistredServers.Remove(RegistredServer.Key);
+                        m_registredServers.Remove(RegistredServer.Key);
                     }
                 }
 

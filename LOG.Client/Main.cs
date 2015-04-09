@@ -7,5 +7,6 @@ namespace LOG.Client
 {
     public class ClientMain
     {
+
     }
 }

@@ -7,6 +7,8 @@ namespace LOG.API
 {
     public class APIMain
     {
+        public static readonly string MasterServerIP = "localhost";
+
         public static readonly int MasterServerPort = 16140;
         public static readonly int ServerPort = 16144;
 

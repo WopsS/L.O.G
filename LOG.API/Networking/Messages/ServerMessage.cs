@@ -72,7 +72,12 @@ namespace LOG.API.Networking.Messages
         /// <summary>
         /// Get or set time when the server is registred and updated every time.
         /// </summary>
-        public double LastRegistred { get; set; }
+        public double LastRegistredTime { get; set; }
+
+        /// <summary>
+        /// Get or set time when the client sended a message to server. Use it to calculate the ping.
+        /// </summary>
+        public double LastMessageSendTime { get; set; }
 
         /// <summary>
         /// Get or set message type.
@@ -93,7 +98,7 @@ namespace LOG.API.Networking.Messages
             MaximumPlayers = netIncomingMessage.ReadInt32();
             Ping = netIncomingMessage.ReadInt32();
 
-            LastRegistred = netIncomingMessage.ReadTime(true);
+            LastRegistredTime = netIncomingMessage.ReadDouble();
         }
 
         /// <summary>

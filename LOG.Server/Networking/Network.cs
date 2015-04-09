@@ -8,18 +8,22 @@ using LOG.Server.Networking.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 
 namespace LOG.Server.Networking
 {
-    internal class Network
+    internal class Network : IDisposable
     {
-        public NetServer m_netServer;
+        public readonly NetServer m_netServer;
 
         private NetPeerConfiguration m_netPeerConfiguration = new NetPeerConfiguration("LOGServer");
+        private IPEndPoint m_masterServer;
         private Thread m_updateThread = null;
         private Dictionary<NetConnection, PlayerModel> m_playersList = new Dictionary<NetConnection, PlayerModel>();
+        private bool m_disposed;
+        private double m_lastRegistered = -60.0f;
 
         /// <summary>
         /// Start local network peer.  
@@ -29,8 +33,10 @@ namespace LOG.Server.Networking
             m_netPeerConfiguration.MaximumConnections = 32;
             m_netPeerConfiguration.Port = APIMain.ServerPort;
             m_netPeerConfiguration.EnableMessageType(NetIncomingMessageType.UnconnectedData);
-            m_netPeerConfiguration.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
+            //m_netPeerConfiguration.EnableMessageType(NetIncomingMessageType.DiscoveryRequest); Commented since client will get list of the servers from master server.
             m_netPeerConfiguration.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+
+            this.m_masterServer = new IPEndPoint(NetUtility.Resolve(APIMain.MasterServerIP), APIMain.MasterServerPort);
 
             Log.HandleLog(LOGMessageTypes.Info, true, true, true, "Server configured.");
             Log.HandleEmptyMessage();
@@ -49,16 +55,34 @@ namespace LOG.Server.Networking
         /// <summary>
         /// Cleanup network statements.
         /// </summary>
-        ~Network()
+        public void Dispose()
         {
-            m_updateThread.Abort();
-            m_netServer.Shutdown("Shutdown!");
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Cleanup network statements.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (m_disposed)
+                return;
+
+            if (disposing)
+            {
+                this.m_updateThread.Abort();
+                this.m_netServer.Shutdown("Shutdown!");
+            }
+
+            m_disposed = true;
         }
 
         private void Update()
         {
             while (!Console.KeyAvailable || Console.ReadKey().Key != ConsoleKey.Escape)
             {
+                this.SendRegistration();
                 this.HandleMessage();
 
                 Thread.Sleep(1);
@@ -94,10 +118,23 @@ namespace LOG.Server.Networking
                         }
                     case NetIncomingMessageType.UnconnectedData:
                         {
-                            // TODO: Send back to the client ping between server and client.
+                            switch ((ServerMessageTypes)netIncomingMessage.ReadByte())
+                            {
+                                case ServerMessageTypes.RequestPing:
+                                    {
+                                        NetOutgoingMessage netOutgoingMessage = this.m_netServer.CreateMessage();
+
+                                        netOutgoingMessage.Write((byte)ServerMessageTypes.RequestPing);
+                                        netOutgoingMessage.Write(this.m_netServer.UniqueIdentifier);
+
+                                        this.m_netServer.SendUnconnectedMessage(netOutgoingMessage, netIncomingMessage.SenderEndPoint);
+                                        break;
+                                    }
+                            }
+
                             break;
                         }
-                    case NetIncomingMessageType.DiscoveryRequest:
+                    /*case NetIncomingMessageType.DiscoveryRequest:
                         {
                             NetOutgoingMessage ResponseMessage = this.m_netServer.CreateMessage();
 
@@ -113,12 +150,10 @@ namespace LOG.Server.Networking
                             this.m_netServer.SendDiscoveryResponse(ResponseMessage, netIncomingMessage.SenderEndPoint);
 
                             break;
-                        }
+                        }*/
                     case NetIncomingMessageType.StatusChanged:
                         {
-                            NetConnectionStatus Status = (NetConnectionStatus)netIncomingMessage.ReadByte();
-
-                            switch (Status)
+                            switch ((NetConnectionStatus)netIncomingMessage.ReadByte())
                             {
                                 case NetConnectionStatus.RespondedConnect:
                                     Log.HandleLog(LOGMessageTypes.Info, "Incoming connection from", netIncomingMessage.SenderEndPoint);
@@ -169,6 +204,37 @@ namespace LOG.Server.Networking
                 }
 
                 this.m_netServer.Recycle(netIncomingMessage);
+            }
+        }
+
+        private void SendRegistration()
+        {
+            if (NetTime.Now > m_lastRegistered + 30)
+            {
+                NetOutgoingMessage netOutgoingMessage = this.m_netServer.CreateMessage();
+
+                IPAddress IPAddressMask;
+                IPAddress IPaddress = NetUtility.GetMyAddress(out IPAddressMask);
+
+                ServerMessage serverMessage = new ServerMessage
+                {
+                    ID = this.m_netServer.UniqueIdentifier,
+                    IPAddress = IPaddress.ToString(),
+                    Port = APIMain.ServerPort,
+                    Hostname = "L.O.G. Server",
+                    Players = this.m_playersList.Count,
+                    MaximumPlayers = 30,
+                    Ping = 0,
+
+                    MessageType = ServerMessageTypes.RegisterHost
+                };
+
+                serverMessage.EncodeMessage(netOutgoingMessage);
+                netOutgoingMessage.Write(new IPEndPoint(IPaddress, APIMain.ServerPort));
+
+                this.m_netServer.SendUnconnectedMessage(netOutgoingMessage, this.m_masterServer);
+
+                m_lastRegistered = (float)NetTime.Now;
             }
         }
     }

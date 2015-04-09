@@ -18,7 +18,7 @@ namespace LOG.Server.Networking
     {
         public readonly NetServer m_netServer;
 
-        private NetPeerConfiguration m_netPeerConfiguration = new NetPeerConfiguration("LOGServer");
+        private NetPeerConfiguration m_netPeerConfiguration = new NetPeerConfiguration("LOGMultiplayer");
         private IPEndPoint m_masterServer;
         private Thread m_updateThread = null;
         private Dictionary<NetConnection, PlayerModel> m_playersList = new Dictionary<NetConnection, PlayerModel>();
@@ -32,6 +32,7 @@ namespace LOG.Server.Networking
         {
             m_netPeerConfiguration.MaximumConnections = 32;
             m_netPeerConfiguration.Port = APIMain.ServerPort;
+            m_netPeerConfiguration.ReceiveBufferSize = 1000000000;
             m_netPeerConfiguration.EnableMessageType(NetIncomingMessageType.UnconnectedData);
             //m_netPeerConfiguration.EnableMessageType(NetIncomingMessageType.DiscoveryRequest); Commented since client will get list of the servers from master server.
             m_netPeerConfiguration.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -223,7 +224,7 @@ namespace LOG.Server.Networking
                     Port = APIMain.ServerPort,
                     Hostname = "L.O.G. Server",
                     Players = this.m_playersList.Count,
-                    MaximumPlayers = 30,
+                    MaximumPlayers = 32,
                     Ping = 0,
 
                     MessageType = ServerMessageTypes.RegisterHost

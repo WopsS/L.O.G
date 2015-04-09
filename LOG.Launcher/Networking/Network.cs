@@ -13,7 +13,7 @@ using LOG.API.Networking.Interfaces;
 
 namespace LOG.MasterServer.Networking
 {
-    internal class Network
+    internal class Network : IDisposable
     {
         public NetClient m_netClient;
 

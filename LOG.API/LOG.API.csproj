@@ -33,6 +33,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>E:\Programe\Stranded Deep Alpha v0.03-FiLELiST\Stranded.Deep.Alpha.v0.03.64Bit\Stranded_Deep_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Lidgren.Network">
       <HintPath>..\..\Lidgren-network-gen3\Lidgren.Network\bin\Debug\Lidgren.Network.dll</HintPath>
       <Private>True</Private>
@@ -54,6 +57,7 @@
     <Compile Include="IO\Log\Logger.cs" />
     <Compile Include="IO\Log\MessageTypes.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Models\PlayerModel.cs" />
     <Compile Include="Networking\Interfaces\IGameMessage.cs" />
     <Compile Include="Networking\Interfaces\IServerMessage.cs" />
     <Compile Include="Networking\MessageHandler.cs" />

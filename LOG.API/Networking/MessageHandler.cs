@@ -13,9 +13,9 @@ namespace LOG.API.Networking
 {
     public class MessageHandler
     {
-        public delegate void GameMessageHandlerDelegate(IGameMessage message);
+        public delegate void GameMessageHandlerDelegate(IGameMessage aGameMessage);
 
-        public event GameMessageHandlerDelegate GameMessageHandlerName;
+        public event GameMessageHandlerDelegate OnVesselUpdateState;
 
         /// <summary>
         /// Handle game message and choose what to do with it.
@@ -27,6 +27,11 @@ namespace LOG.API.Networking
 
             switch (gameMessage)
             {
+                case GameMessageTypes.UpdateVesseState:
+                    {
+                        this.OnVesselUpdateState(new VesselMessage(Message));
+                        break;
+                    }
                 default:
                     {
                         Log.HandleLog(LOGMessageTypes.Error, "Unhandled game message type " + gameMessage);

@@ -57,9 +57,12 @@
     <Compile Include="Networking\Interfaces\IGameMessage.cs" />
     <Compile Include="Networking\Interfaces\IServerMessage.cs" />
     <Compile Include="Networking\MessageHandler.cs" />
+    <Compile Include="Networking\Messages\ConnectionApprovalRequestMessage.cs" />
+    <Compile Include="Networking\Messages\DiscoveryRequestMessage.cs" />
     <Compile Include="Networking\Messages\Types\GameMessageTypes.cs" />
     <Compile Include="Networking\Messages\Types\ServerMessageTypes.cs" />
     <Compile Include="Networking\Messages\ServerMessage.cs" />
+    <Compile Include="Networking\Messages\VesselMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

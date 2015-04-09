@@ -9,5 +9,7 @@ namespace LOG.API
     {
         public static readonly int MasterServerPort = 16140;
         public static readonly int ServerPort = 16144;
+
+        public static readonly string Version = "0.0.1";
     }
 }

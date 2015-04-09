@@ -10,6 +10,9 @@ namespace LOG.API.Networking.Messages.Types
     /// </summary>
     public enum GameMessageTypes
     {
+        DiscoveryState = 1,
+        ConnectionApprovalRequest,
 
+        UpdateVesseState,
     }
 }

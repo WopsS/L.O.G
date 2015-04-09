@@ -9,7 +9,15 @@ namespace LOG.Server
 {
     class ServerMain
     {
-        private static Network network = null;
+        private static Network m_network = null;
+
+        public static Network GetNetworkClass
+        {
+            get
+            {
+                return m_network;
+            }
+        }
 
         static void Main(string[] args)
         {
@@ -19,7 +27,7 @@ namespace LOG.Server
             Log.HandleLog(LOGMessageTypes.Info, "Server started at", DateTime.Now.ToString("HH:mm:ss") + ".");
             Log.HandleEmptyMessage();
 
-            network = new Network();
+            m_network = new Network();
         }
     }
 }
